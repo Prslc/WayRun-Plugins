@@ -12,7 +12,7 @@ framework own the stdin/stdout JSON-RPC 2.0 transport.
 wayrun-plugin/
 ├── wayrun_plugin/          # shared framework
 │   ├── __init__.py         #   public API + __version__
-│   ├── _item.py            #   Item, copy_text, hint, split_command
+│   ├── _item.py            #   Item, the command builders, hint, split_command
 │   ├── _plugin.py          #   Plugin (the decorators)
 │   └── _server.py          #   Server / serve (the JSON-RPC loop)
 ├── template/               # cp -r template <new-plugin>
@@ -111,13 +111,16 @@ shows the rows it returns (protocol: WayRun `docs/en/jsonrpc.md`). A
 zero-argument handler; normalization matches `search`:
 
 ```python
+from wayrun_plugin import Item, plugin, run
+
+
 @plugin.default_view
 def top() -> list[Item]:
     return [
         Item(
             title="Buy milk",
             summary="Open - Enter marks done",
-            on_click="run:... toggle 1",
+            on_click=run("todo toggle 1"),
         )
     ]
 ```
@@ -136,7 +139,7 @@ per-row icon.
 Item(
     title="Title",
     summary="Secondary line",
-    on_click="run:xdg-open ...",
+    on_click=run("xdg-open ..."),
     icon="papirus:folder-open",
 )
 ```
@@ -145,14 +148,28 @@ Item(
 for one-shot hits whose target is not worth re-opening later (the GitHub
 plugin marks its repository results this way).
 
-`on_click` schemes: `run:<shell>`, `copy:{"text":...}`,
-`launch:<desktop-id>`, or a bare URL / `file:` / `mailto:` URI. Without one,
-the row is display-only.
+### Command builders
+
+`on_click` is a typed command object (`{"type": ..., ...}`), not a scheme
+string. The helpers build one; import them from `wayrun_plugin`:
+
+| Helper | Command |
+|--------|---------|
+| `run(cmd)` | run `cmd` through a shell |
+| `open_uri(uri)` | open a URL / `file:` / `mailto:` URI with the default handler |
+| `copy_text(text)` | write `text` to the Wayland clipboard |
+| `launch(desktop_id)` | launch an app by desktop id |
+| `desktop_action(desktop_id, action_id)` | run one `[Desktop Action …]` group |
+| `reveal(uri)` | show a file in the file manager (panel-only) |
+| `terminal(uri)` | open a terminal in the URI's directory, its parent for a file (panel-only) |
+
+A row without `on_click` is display-only. The wire shape is the `Command`
+object documented in the WayRun `docs/en/jsonrpc.md`.
 
 ### `copy_text(text)`
 
-Builds an `on_click` that writes `text` to the Wayland clipboard (the JSON is
-escaped for you, so quotes and newlines are safe): `copy:{"text": "..."}`.
+Builds the command that writes `text` to the Wayland clipboard (quotes and
+newlines are safe): `{"type": "copy", "text": "..."}`.
 
 ### `hint(title, detail=None)`
 
@@ -211,7 +228,7 @@ The JSON-RPC 2.0 contract with the WayRun core (full protocol in WayRun
 | `list_plugins` | `[{id, name, keyword, icon, description, enabled}]` |
 | `search` | array of rows; `text` must be a non-empty string, else `-32602`; `params.plugin`, when present, must equal the plugin id |
 | `top` | the default view request; rows, or `-32601` when unregistered |
-| `forget` | core relays a row that was forgotten (`on_click`); `null`, or `-32601` when unregistered |
+| `forget` | core relays a forgotten row's `on_click` command; `null`, or `-32601` when unregistered |
 | request without `id` | no response (notification) |
 | unparseable / non-object / `jsonrpc != "2.0"` / non-string method | `-32600` |
 | unknown method | `-32601` |

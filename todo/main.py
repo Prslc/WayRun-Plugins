@@ -2,7 +2,7 @@
 """Todo plugin: a complete task manager.
 
 Demonstrates @plugin.search, @plugin.default_view, a forget handler, and
-state changes that re-invoke this script through the run: scheme (so state
+state changes that re-invoke this script through a `run` command (so state
 lives in a file and nothing depends on the core staying alive).
 
 Data: ~/.config/wayrun/todo.json
@@ -20,13 +20,13 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from wayrun_plugin import Item, plugin
+from wayrun_plugin import Item, plugin, run
 
 ICON = "papirus:task-complete"
 DATA_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "wayrun"
 DATA_PATH = DATA_DIR / "todo.json"
 
-# The run: scheme goes through a shell, so quote the path.
+# A `run` command goes through a shell, so quote the path.
 THIS_PATH = str(Path(__file__).resolve())
 THIS = shlex.quote(THIS_PATH)
 
@@ -60,7 +60,7 @@ def broken_item() -> Item:
 
 def row(item: dict[str, Any]) -> Item:
     """A todo row; Enter toggles its state."""
-    action = f"run:{THIS} toggle {item['id']}"
+    action = run(f"{THIS} toggle {item['id']}")
     if item["done"]:
         return Item(title=item["text"], summary="Done · Enter reopens", on_click=action)
     return Item(title=item["text"], summary="Open · Enter marks done", on_click=action)
@@ -82,7 +82,7 @@ def search(text: str) -> list[Item]:
     if matches:
         return [row(it) for it in matches]
     # No match: offer to add the input as a new todo.
-    action = f"run:{THIS} add {shlex.quote(text)}"
+    action = run(f"{THIS} add {shlex.quote(text)}")
     return [Item(title=f'Add "{text}"', summary="Enter adds it", on_click=action)]
 
 
@@ -98,13 +98,16 @@ def top() -> list[Item]:
 
 @plugin.method("forget")
 def forget(params: object) -> None:
-    """Delete the todo whose on_click this forgotten row carries."""
+    """Delete the todo whose on_click command this forgotten row carries."""
     if not isinstance(params, dict):
         return
     on_click = params.get("on_click")
-    if not isinstance(on_click, str) or not on_click.startswith("run:"):
+    if not isinstance(on_click, dict) or on_click.get("type") != "run":
         return
-    parts = shlex.split(on_click[len("run:") :])
+    cmd = on_click.get("cmd")
+    if not isinstance(cmd, str):
+        return
+    parts = shlex.split(cmd)
     if len(parts) == 3 and parts[0] == THIS_PATH and parts[1] == "toggle":
         with contextlib.suppress(ValueError):
             cli_delete(int(parts[2]))
@@ -145,7 +148,7 @@ def main() -> None:
     if len(sys.argv) < 2:
         plugin.run()  # started by the core: serve the JSON-RPC loop
         return
-    action, *args = sys.argv[1:]  # started by the run: scheme: apply a change
+    action, *args = sys.argv[1:]  # started by a run command: apply a change
     if action == "add" and args:
         cli_add(" ".join(args))
     elif action == "toggle" and args:

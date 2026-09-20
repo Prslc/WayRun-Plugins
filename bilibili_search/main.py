@@ -8,7 +8,7 @@ from urllib.request import Request, urlopen
 # Workspace root, home of the shared wayrun_plugin package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from wayrun_plugin import Item, hint, plugin
+from wayrun_plugin import Item, hint, open_uri, plugin
 
 ICON = str(Path(__file__).with_name("icon.png"))
 
@@ -39,7 +39,9 @@ def search(text: str) -> list[Item]:
         Item(
             title=kw,
             summary="Bilibili Search" if kw == text else "Bilibili Search suggestion",
-            on_click="https://search.bilibili.com/all?" + urlencode({"keyword": kw}),
+            on_click=open_uri(
+                "https://search.bilibili.com/all?" + urlencode({"keyword": kw})
+            ),
         )
         for kw in kws
     ]

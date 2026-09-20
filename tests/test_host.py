@@ -1,20 +1,32 @@
 """Contract tests for the wayrun_plugin JSON-RPC host."""
 
-import json
 import unittest
 from typing import Any
 
-from wayrun_plugin import Item, Plugin, Server, copy_text, hint, split_command
+from wayrun_plugin import (
+    Item,
+    Plugin,
+    Server,
+    copy_text,
+    desktop_action,
+    hint,
+    launch,
+    open_uri,
+    reveal,
+    run,
+    split_command,
+    terminal,
+)
 
 
 def make_plugin() -> Plugin:
     p = Plugin()
 
     @p.search(id="test", name="Test", keyword="t", icon="papirus:test", description="d")
-    def search(text: str) -> list[Item | dict[str, str]]:
+    def search(text: str) -> list[Item | dict[str, Any]]:
         return [
             Item(title=text),
-            {"title": "dict row", "summary": "s", "on_click": "run:true"},
+            {"title": "dict row", "summary": "s", "on_click": run("true")},
         ]
 
     @p.method("echo")
@@ -200,8 +212,32 @@ class ServerTest(unittest.TestCase):
 
     def test_copy_text_roundtrip(self) -> None:
         text = 'say "hi"\ncafé'
-        payload = json.loads(copy_text(text)[len("copy:") :])
-        self.assertEqual(payload["text"], text)
+        self.assertEqual(copy_text(text), {"type": "copy", "text": text})
+
+    def test_command_builders_emit_structured_commands(self) -> None:
+        self.assertEqual(run("ls -a"), {"type": "run", "cmd": "ls -a"})
+        self.assertEqual(
+            open_uri("https://example.com"),
+            {"type": "open", "uri": "https://example.com"},
+        )
+        self.assertEqual(
+            launch("firefox.desktop"),
+            {"type": "launch", "desktop_id": "firefox.desktop"},
+        )
+        self.assertEqual(
+            desktop_action("firefox.desktop", "new-window"),
+            {
+                "type": "desktop_action",
+                "desktop_id": "firefox.desktop",
+                "action_id": "new-window",
+            },
+        )
+        self.assertEqual(
+            reveal("file:///tmp/a"), {"type": "reveal", "uri": "file:///tmp/a"}
+        )
+        self.assertEqual(
+            terminal("file:///tmp/a"), {"type": "terminal", "uri": "file:///tmp/a"}
+        )
 
 
 class HelperTest(unittest.TestCase):

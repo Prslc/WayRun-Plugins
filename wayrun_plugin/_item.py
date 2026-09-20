@@ -1,10 +1,12 @@
-"""Result rows and the helpers that build their ``on_click`` values."""
+"""Result rows and the helpers that build their ``on_click`` commands."""
 
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from typing import Any
+
+# One wire command, ``{"type": ..., ...}``; see the WayRun protocol docs.
+Command = dict[str, Any]
 
 
 @dataclass
@@ -21,7 +23,7 @@ class Item:
 
     title: str
     summary: str | None = None
-    on_click: str | None = None
+    on_click: Command | None = None
     icon: str | None = None
     ephemeral: bool = False
 
@@ -38,9 +40,39 @@ class Item:
         return item
 
 
-def copy_text(text: str) -> str:
-    """An ``on_click`` that writes ``text`` to the Wayland clipboard."""
-    return "copy:" + json.dumps({"text": text}, ensure_ascii=False)
+def run(cmd: str) -> Command:
+    """A command that runs ``cmd`` through a shell."""
+    return {"type": "run", "cmd": cmd}
+
+
+def open_uri(uri: str) -> Command:
+    """A command that opens ``uri`` with the default handler (URL/file/mailto)."""
+    return {"type": "open", "uri": uri}
+
+
+def copy_text(text: str) -> Command:
+    """A command that writes ``text`` to the Wayland clipboard."""
+    return {"type": "copy", "text": text}
+
+
+def launch(desktop_id: str) -> Command:
+    """A command that launches an app by desktop id."""
+    return {"type": "launch", "desktop_id": desktop_id}
+
+
+def desktop_action(desktop_id: str, action_id: str) -> Command:
+    """A command that runs one ``[Desktop Action …]`` group of a desktop file."""
+    return {"type": "desktop_action", "desktop_id": desktop_id, "action_id": action_id}
+
+
+def reveal(uri: str) -> Command:
+    """A command that shows a file in the file manager (panel-only)."""
+    return {"type": "reveal", "uri": uri}
+
+
+def terminal(uri: str) -> Command:
+    """A command that opens a terminal in the URI's directory (panel-only)."""
+    return {"type": "terminal", "uri": uri}
 
 
 def hint(title: str, detail: str | None = None) -> Item:

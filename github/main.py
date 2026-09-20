@@ -12,7 +12,7 @@ from urllib.request import Request, urlopen
 # Workspace root, home of the shared wayrun_plugin package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from wayrun_plugin import Item, plugin
+from wayrun_plugin import Item, open_uri, plugin
 
 ICON = "papirus:github"
 # Optional classic or fine-grained PAT; both authenticate as "Bearer". Without
@@ -56,7 +56,7 @@ def search(text: str) -> list[Item]:
         Item(
             title=repo["full_name"],
             summary=repo.get("description"),
-            on_click=repo["html_url"],
+            on_click=open_uri(repo["html_url"]),
             icon=ICON,
             # a repo hit is a one-shot search result, not a target to re-open
             ephemeral=True,

@@ -12,7 +12,7 @@ English: [README.md](../../README.md)
 wayrun-plugin/
 ├── wayrun_plugin/          # 共享框架
 │   ├── __init__.py         #   公共 API 与 __version__
-│   ├── _item.py            #   Item、copy_text、hint、split_command
+│   ├── _item.py            #   Item、命令构造器、hint、split_command
 │   ├── _plugin.py          #   Plugin（装饰器）
 │   └── _server.py          #   Server / serve（JSON-RPC 循环）
 ├── template/               # cp -r template <新插件目录>
@@ -109,13 +109,16 @@ dict）原样作为 `result` 序列化。
 零参数处理函数，返回结果行，归一化与 `search` 相同：
 
 ```python
+from wayrun_plugin import Item, plugin, run
+
+
 @plugin.default_view
 def top() -> list[Item]:
     return [
         Item(
             title="买牛奶",
             summary="待完成 · Enter 标记完成",
-            on_click="run:... toggle 1",
+            on_click=run("todo toggle 1"),
         )
     ]
 ```
@@ -132,7 +135,7 @@ def top() -> list[Item]:
 Item(
     title="标题",
     summary="副行",
-    on_click="run:xdg-open ...",
+    on_click=run("xdg-open ..."),
     icon="papirus:folder-open",
 )
 ```
@@ -140,13 +143,28 @@ Item(
 `ephemeral=True` 要求 core 不把该行记入使用历史，适合一次性的搜索命中（github
 插件就是这么标记仓库结果的）。
 
-`on_click` 支持的 scheme：`run:<shell>`、`copy:{"text":...}`、
-`launch:<desktop-id>`、裸 URL / `file:` / `mailto:` URI。不设置则条目仅展示。
+### 命令构造器
+
+`on_click` 是带类型的命令对象（`{"type": ..., ...}`），不是 scheme 字符串。
+以下构造器负责生成，直接从 `wayrun_plugin` 导入：
+
+| 构造器 | 命令 |
+|--------|------|
+| `run(cmd)` | 通过 shell 执行 `cmd` |
+| `open_uri(uri)` | 用默认处理器打开 URL / `file:` / `mailto:` URI |
+| `copy_text(text)` | 写入 Wayland 剪贴板 |
+| `launch(desktop_id)` | 按 desktop id 启动应用 |
+| `desktop_action(desktop_id, action_id)` | 运行一个 `[Desktop Action …]` 组 |
+| `reveal(uri)` | 在文件管理器中定位文件（仅面板可见） |
+| `terminal(uri)` | 在 URI 所在目录打开终端，文件则用其父目录（仅面板可见） |
+
+不设置 `on_click` 的行仅展示。线上格式就是 WayRun `docs/zh_cn/jsonrpc.md`
+里记录的 `Command` 对象。
 
 ### `copy_text(text)`
 
-生成写入 Wayland 剪贴板的 `on_click` 值（内部 JSON 转义，安全处理引号/换行）：
-`copy:{"text": "..."}`。
+生成写入 Wayland 剪贴板的命令（引号和换行都安全）：
+`{"type": "copy", "text": "..."}`。
 
 ### `hint(title, detail=None)`
 
@@ -201,7 +219,7 @@ return [hint("金额无效：'abc'", "例：cc 100 usd cny")]
 | `list_plugins` | `[{id, name, keyword, icon, description, enabled}]` |
 | `search` | 条目数组；`text` 非空字符串否则 `-32602`；`params.plugin` 若存在必须等于插件 id |
 | `top` | 打开时的默认视图请求；结果项数组，未注册 `-32601` |
-| `forget` | 行被 ⌫ forget 时 core 的转发（`on_click`）；`null`，未注册 `-32601` |
+| `forget` | 行被 ⌫ forget 时 core 转发该行的 `on_click` 命令；`null`，未注册 `-32601` |
 | 无 `id` 的请求 | 无响应（notification） |
 | JSON 无法解析 / 非对象 / `jsonrpc != "2.0"` / method 非字符串 | `-32600` |
 | 未知方法 | `-32601` |

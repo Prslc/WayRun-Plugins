@@ -16,20 +16,37 @@ A plugin is one ``main.py`` that registers its handlers and then calls
 is documented in the WayRun repository (``docs/en/jsonrpc.md``).
 """
 
-from ._item import Item, copy_text, hint, split_command
+from ._item import (
+    Item,
+    copy_text,
+    desktop_action,
+    hint,
+    launch,
+    open_uri,
+    reveal,
+    run,
+    split_command,
+    terminal,
+)
 from ._plugin import Plugin
 from ._server import Server, serve
 
 plugin = Plugin()
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "plugin",
     "Item",
     "copy_text",
+    "desktop_action",
     "hint",
+    "launch",
+    "open_uri",
+    "reveal",
+    "run",
     "split_command",
+    "terminal",
     "Plugin",
     "Server",
     "serve",
