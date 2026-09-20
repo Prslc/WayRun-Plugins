@@ -9,7 +9,6 @@ wayrun_plugin package; this file only declares the plugin.
 import sys
 from pathlib import Path
 
-# Workspace root, home of the shared wayrun_plugin package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from core.api import query_translate

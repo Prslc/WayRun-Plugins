@@ -17,9 +17,6 @@ single executable token; chmod +x main.py and use an absolute path):
 import sys
 from pathlib import Path
 
-# Workspace root, home of the shared wayrun_plugin package. When a plugin
-# is deployed outside this workspace, install wayrun_plugin (pip install
-# the workspace) instead; the line above stays harmless.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import Item, copy_text, hint, plugin

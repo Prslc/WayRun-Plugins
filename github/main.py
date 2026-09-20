@@ -5,11 +5,11 @@ import json
 import os
 import sys
 from pathlib import Path
+from typing import Any
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-# Workspace root, home of the shared wayrun_plugin package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import Item, open_uri, plugin
@@ -20,7 +20,7 @@ ICON = "papirus:github"
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 
 
-def fetch_repos(query: str, token: str) -> dict:
+def fetch_repos(query: str, token: str) -> dict[str, Any]:
     """Run the repository search, authenticating only when ``token`` is set."""
     headers = {"Accept": "application/vnd.github+json"}
     if token:

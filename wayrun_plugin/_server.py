@@ -6,10 +6,19 @@ import inspect
 import json
 import sys
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Protocol
 
 from ._item import Item
-from ._plugin import Plugin
+
+
+class PluginLike(Protocol):
+    """What the server needs from a plugin registry; implemented by ``Plugin``."""
+
+    @property
+    def meta(self) -> dict[str, Any]: ...
+
+    @property
+    def handlers(self) -> dict[str, Callable[..., Any]]: ...
 
 
 def _error(id_: Any, code: int, message: str) -> dict[str, Any]:
@@ -34,8 +43,8 @@ def _wants_params(handler: Callable[..., Any]) -> bool:
 class Server:
     """Validates one request line and dispatches it to a Plugin."""
 
-    def __init__(self, plugin: Plugin) -> None:
-        self._plugin = plugin
+    def __init__(self, plugin: PluginLike) -> None:
+        self._plugin: PluginLike = plugin
 
     def handle(self, line: str) -> dict[str, Any] | None:
         """The response for one request line, or None for a notification."""
@@ -109,7 +118,7 @@ class Server:
         return rows
 
 
-def serve(plugin: Plugin) -> None:
+def serve(plugin: PluginLike) -> None:
     """Read requests from stdin, write responses to stdout, exit on EOF."""
     server = Server(plugin)
     for line in sys.stdin:

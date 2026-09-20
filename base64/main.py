@@ -11,7 +11,6 @@ import base64
 import sys
 from pathlib import Path
 
-# Workspace root, home of the shared wayrun_plugin package.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import Item, copy_text, hint, plugin, split_command
