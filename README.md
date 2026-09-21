@@ -15,10 +15,11 @@ wayrun-plugin/
 │   ├── _item.py            #   Item, the command builders, hint, split_command
 │   ├── _plugin.py          #   Plugin (the decorators)
 │   └── _server.py          #   Server / serve (the JSON-RPC loop)
-├── template/               # cp -r template <new-plugin>
+├── template/               # cp -r template <new-plugin>; ships icon.svg
 ├── tests/test_host.py      # framework protocol contract tests (unittest)
 ├── ruff.toml               # lint + format config
 ├── pyrightconfig.json      # LSP config
+├── NOTICE                  # bundled-icon attribution (Material Symbols)
 ├── github/                 # example: GitHub repository search
 ├── todo/                   # full example: todo manager
 ├── base64/ bilibili_search/ cc/ translate_youdao/
@@ -65,12 +66,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import plugin, Item, copy_text
 
+# Ship an icon beside main.py; the core resolves no theme name.
+ICON = str(Path(__file__).resolve().with_name("icon.svg"))
+
 
 @plugin.search(
     id="my-plugin",  # must match the plugins.toml id
     name="My Plugin",
     keyword="mp",
-    icon="papirus:star",  # absolute path or a papirus: spec
+    icon=ICON,  # absolute path to an icon the plugin ships
     description="Short description",
 )
 def search(text: str) -> list[Item]:
@@ -92,7 +96,7 @@ handler on `def search(text: str)`.
 | `id` | yes | plugin id; must match the `plugins.toml` entry |
 | `name` | no | display name (falls back to the configured id) |
 | `keyword` | no | trigger prefix (empty = a default provider) |
-| `icon` | no | absolute path or a `papirus:` spec |
+| `icon` | no | absolute path to an icon file the plugin ships |
 | `description` | no | readiness hint text |
 
 ### `@plugin.method(name)`
@@ -140,13 +144,25 @@ Item(
     title="Title",
     summary="Secondary line",
     on_click=run("xdg-open ..."),
-    icon="papirus:folder-open",
+    icon=str(Path(__file__).resolve().with_name("row.svg")),
 )
 ```
 
 `ephemeral=True` asks the core not to record the row in usage history. Use it
 for one-shot hits whose target is not worth re-opening later (the GitHub
 plugin marks its repository results this way).
+
+### Icons
+
+An external host owns its icons: the WayRun core resolves no theme icon name, no
+`papirus:` spec and no `builtin:` glyph for a plugin. Ship the icon file inside
+the plugin directory and pass its **absolute path** — that is what the core
+renders (`file://` + path). `Path(__file__).resolve().with_name(...)` is the
+portable way to build it.
+
+`icon` is the plugin identity (the `?` list and the keyword hint) and the
+per-row fallback; a row's own `icon` overrides it. A missing or non-absolute
+icon falls back to the core's built-in placeholder.
 
 ### Command builders
 

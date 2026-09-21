@@ -15,10 +15,11 @@ wayrun-plugin/
 │   ├── _item.py            #   Item、命令构造器、hint、split_command
 │   ├── _plugin.py          #   Plugin（装饰器）
 │   └── _server.py          #   Server / serve（JSON-RPC 循环）
-├── template/               # cp -r template <新插件目录>
+├── template/               # cp -r template <新插件目录>；自带 icon.svg
 ├── tests/test_host.py      # 框架协议契约测试（unittest，无第三方依赖）
 ├── ruff.toml               # 代码风格配置
 ├── pyrightconfig.json      # LSP 配置
+├── NOTICE                  # 内置图标署名（Material Symbols）
 ├── github/                 # 示例：GitHub 仓库搜索
 ├── todo/                   # 完整示范：待办管理
 ├── base64/ bilibili_search/ cc/ translate_youdao/
@@ -64,12 +65,15 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import plugin, Item, copy_text
 
+# 图标放在 main.py 同目录；后端不解析任何主题图标名。
+ICON = str(Path(__file__).resolve().with_name("icon.svg"))
+
 
 @plugin.search(
     id="my-plugin",  # 与 plugins.toml 的 id 一致
     name="My Plugin",
     keyword="mp",
-    icon="papirus:star",  # 绝对路径或 papirus: 图标规格
+    icon=ICON,  # 插件自带图标的绝对路径
     description="简短说明",
 )
 def search(text: str) -> list[Item]:
@@ -91,7 +95,7 @@ plugin.run()
 | `id` | 是 | 插件 id，必须与 `plugins.toml` 条目一致 |
 | `name` | 否 | 显示名（空则回退为配置的 id） |
 | `keyword` | 否 | 触发前缀（空 = 默认触发） |
-| `icon` | 否 | 图标绝对路径或 `papirus:` 规格 |
+| `icon` | 否 | 插件自带图标文件的绝对路径 |
 | `description` | 否 | 就绪提示文案 |
 
 ### `@plugin.method(name)`
@@ -136,12 +140,21 @@ Item(
     title="标题",
     summary="副行",
     on_click=run("xdg-open ..."),
-    icon="papirus:folder-open",
+    icon=str(Path(__file__).resolve().with_name("row.svg")),
 )
 ```
 
 `ephemeral=True` 要求 core 不把该行记入使用历史，适合一次性的搜索命中（github
 插件就是这么标记仓库结果的）。
+
+### 图标
+
+图标由外部主机自备：WayRun 后端**不**为主机解析主题图标名、`papirus:` 规格或
+`builtin:` 字形。把图标文件放进插件目录，传它的**绝对路径**——后端就按
+`file://` + 路径渲染。`Path(__file__).resolve().with_name(...)` 是可移植的构造方式。
+
+`icon` 既是插件身份（`?` 列表与关键词提示），也是逐行回退值；行自身的 `icon`
+覆盖它。图标缺失或不是绝对路径时，回退到后端内置的占位图标。
 
 ### 命令构造器
 

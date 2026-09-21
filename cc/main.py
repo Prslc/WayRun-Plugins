@@ -29,7 +29,7 @@ from wayrun_plugin import Item, copy_text, hint, plugin
 
 # Bundled icon (absolute path; the UI renders file://). Shared by the plugin
 # icon and the per-row fallback.
-ICON = str(Path(__file__).with_name("icon.svg"))
+ICON = str(Path(__file__).resolve().with_name("icon.svg"))
 DATA_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "wayrun"
 CACHE_PATH = DATA_DIR / "cc_rates.json"
 TTL_SECONDS = 12 * 3600

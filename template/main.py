@@ -21,12 +21,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import Item, copy_text, hint, plugin
 
+# Bundled icon (absolute path; the UI renders file://). Ship an icon file beside
+# main.py and point at it; the core resolves no theme name or `papirus:` spec.
+ICON = str(Path(__file__).resolve().with_name("icon.svg"))
+
 
 @plugin.search(
     id="template",  # must match the plugins.toml entry id
     name="Template",
     keyword="tmp",
-    icon="papirus:star",
+    icon=ICON,
     description="Example plugin skeleton",
 )
 def search(text: str) -> list[Item | dict[str, str]]:

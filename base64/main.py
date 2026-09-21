@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from wayrun_plugin import Item, copy_text, hint, plugin, split_command
 
 # Bundled icon (absolute path; the UI renders file://).
-ICON = str(Path(__file__).with_name("icon.png"))
+ICON = str(Path(__file__).resolve().with_name("icon.png"))
 
 USAGE = "Usage: base64 <e|d> <text>"
 

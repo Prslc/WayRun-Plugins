@@ -22,7 +22,13 @@ from wayrun_plugin import (
 def make_plugin() -> Plugin:
     p = Plugin()
 
-    @p.search(id="test", name="Test", keyword="t", icon="papirus:test", description="d")
+    @p.search(
+        id="test",
+        name="Test",
+        keyword="t",
+        icon="/opt/plugin/icon.svg",
+        description="d",
+    )
     def search(text: str) -> list[Item | dict[str, Any]]:
         return [
             Item(title=text),
@@ -39,7 +45,7 @@ def make_plugin() -> Plugin:
 
     @p.method("items")
     def items(_params: object) -> list[Item]:
-        return [Item(title="a"), Item(title="b", icon="papirus:x")]
+        return [Item(title="a"), Item(title="b", icon="/opt/plugin/x.svg")]
 
     return p
 
@@ -71,7 +77,7 @@ class ServerTest(unittest.TestCase):
                     "id": "test",
                     "name": "Test",
                     "keyword": "t",
-                    "icon": "papirus:test",
+                    "icon": "/opt/plugin/icon.svg",
                     "description": "d",
                     "enabled": True,
                 }
@@ -84,9 +90,9 @@ class ServerTest(unittest.TestCase):
         )
         rows = resp["result"]
         self.assertEqual(rows[0]["title"], "hello")
-        self.assertEqual(rows[0]["icon"], "papirus:test")  # Item icon fallback
+        self.assertEqual(rows[0]["icon"], "/opt/plugin/icon.svg")  # Item icon fallback
         self.assertEqual(rows[1]["title"], "dict row")  # plain dict accepted
-        self.assertEqual(rows[1]["icon"], "papirus:test")  # dict icon fallback
+        self.assertEqual(rows[1]["icon"], "/opt/plugin/icon.svg")  # dict icon fallback
         for row in rows:  # all four keys present
             self.assertEqual(set(row), {"title", "summary", "on_click", "icon"})
 
@@ -135,8 +141,8 @@ class ServerTest(unittest.TestCase):
         resp = self.req('{"jsonrpc":"2.0","method":"items","id":15}')
         rows = resp["result"]
         self.assertEqual([r["title"] for r in rows], ["a", "b"])
-        self.assertEqual(rows[0]["icon"], "papirus:test")  # fallback
-        self.assertEqual(rows[1]["icon"], "papirus:x")  # explicit kept
+        self.assertEqual(rows[0]["icon"], "/opt/plugin/icon.svg")  # fallback
+        self.assertEqual(rows[1]["icon"], "/opt/plugin/x.svg")  # explicit kept
 
     def test_custom_method_error_is_internal_error(self) -> None:
         resp = self.req('{"jsonrpc":"2.0","method":"boom","id":12}')
@@ -150,7 +156,7 @@ class ServerTest(unittest.TestCase):
             id="dv",
             name="DV",
             keyword="dv",
-            icon="papirus:dv",
+            icon="/opt/plugin/dv.svg",
             description="default view test",
         )
         def search(_text: str) -> list[Item]:
@@ -158,15 +164,18 @@ class ServerTest(unittest.TestCase):
 
         @p.default_view
         def top() -> list[Item]:
-            return [Item(title="dv row"), Item(title="dv icon", icon="papirus:x")]
+            return [
+                Item(title="dv row"),
+                Item(title="dv icon", icon="/opt/plugin/x.svg"),
+            ]
 
         resp = Server(p).handle(
             '{"jsonrpc":"2.0","method":"top","params":{"plugin":"dv"},"id":16}'
         )
         assert resp is not None
         self.assertEqual([r["title"] for r in resp["result"]], ["dv row", "dv icon"])
-        self.assertEqual(resp["result"][0]["icon"], "papirus:dv")  # fallback
-        self.assertEqual(resp["result"][1]["icon"], "papirus:x")  # explicit
+        self.assertEqual(resp["result"][0]["icon"], "/opt/plugin/dv.svg")  # fallback
+        self.assertEqual(resp["result"][1]["icon"], "/opt/plugin/x.svg")  # explicit
 
     def test_no_param_method_is_called_without_args(self) -> None:
         p = Plugin()
@@ -273,7 +282,7 @@ class SubcommandPluginTest(unittest.TestCase):
     def _plugin(self) -> Plugin:
         p = Plugin()
 
-        @p.search(id="sub", name="Sub", icon="papirus:sub", description="d")
+        @p.search(id="sub", name="Sub", icon="/opt/plugin/sub.svg", description="d")
         def search(text: str) -> list[Item]:
             verb, payload = split_command(text)
             if verb == "e":
@@ -294,7 +303,7 @@ class SubcommandPluginTest(unittest.TestCase):
     def test_routes_and_normalizes(self) -> None:
         rows = self._search("e x y")
         self.assertEqual(rows[0]["title"], "enc:x y")
-        self.assertEqual(rows[0]["icon"], "papirus:sub")  # plugin icon fallback
+        self.assertEqual(rows[0]["icon"], "/opt/plugin/sub.svg")  # plugin icon fallback
 
     def test_unknown_verb_yields_usage_row(self) -> None:
         rows = self._search("z q")

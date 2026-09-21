@@ -3,10 +3,15 @@
 A plugin is one ``main.py`` that registers its handlers and then calls
 ``plugin.run()``:
 
+    from pathlib import Path
+
     from wayrun_plugin import plugin, Item, copy_text
 
+    # Ship an icon beside main.py; the core resolves no theme name.
+    ICON = str(Path(__file__).resolve().with_name("icon.svg"))
+
     @plugin.search(id="example", name="Example", keyword="ex",
-                   icon="papirus:star", description="Demo plugin")
+                   icon=ICON, description="Demo plugin")
     def search(text: str) -> list[Item]:
         return [Item(title="Hello", on_click=copy_text(text))]
 

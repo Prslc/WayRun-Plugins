@@ -16,7 +16,8 @@ from core.settings import load_settings
 
 from wayrun_plugin import Item, copy_text, plugin
 
-ICON = "papirus:translator"
+# Bundled icon (absolute path; the UI renders file://).
+ICON = str(Path(__file__).resolve().with_name("icon.svg"))
 
 
 @plugin.search(

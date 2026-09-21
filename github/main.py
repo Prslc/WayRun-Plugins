@@ -14,7 +14,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import Item, open_uri, plugin
 
-ICON = "papirus:github"
+# Bundled icon (absolute path; the UI renders file://).
+ICON = str(Path(__file__).resolve().with_name("icon.svg"))
 # Optional classic or fine-grained PAT; both authenticate as "Bearer". Without
 # it the search API is limited to 10 req/min and 60 req/hr per IP.
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")

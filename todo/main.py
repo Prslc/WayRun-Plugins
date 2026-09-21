@@ -22,7 +22,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import Item, plugin, run
 
-ICON = "papirus:task-complete"
+# Bundled icon (absolute path; the UI renders file://).
+ICON = str(Path(__file__).resolve().with_name("icon.svg"))
 DATA_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "wayrun"
 DATA_PATH = DATA_DIR / "todo.json"
 

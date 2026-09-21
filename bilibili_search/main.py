@@ -9,7 +9,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import Item, hint, open_uri, plugin
 
-ICON = str(Path(__file__).with_name("icon.png"))
+# Bundled icon (absolute path; the UI renders file://).
+ICON = str(Path(__file__).resolve().with_name("icon.png"))
 
 
 @plugin.search(
