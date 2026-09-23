@@ -275,3 +275,13 @@ printf '%s\n' '{"jsonrpc":"2.0","method":"search","params":{"text":"hello"},"id"
 - Standard library only: `Item` and the protocol layer have no third-party
   dependencies. Each plugin manages its own (for example
   `Flow.translate-youdao/requirements.txt`).
+
+## License
+
+Dual licensed under either of the following, at your option:
+
+- **MIT** — [LICENSE-MIT](LICENSE-MIT)
+- **Apache-2.0** — [LICENSE-APACHE](LICENSE-APACHE)
+
+The bundled plugin icons are Google Material Symbols under the Apache License
+2.0; see [NOTICE](NOTICE) for the attribution and the full license text.

@@ -260,3 +260,13 @@ printf '%s\n' '{"jsonrpc":"2.0","method":"search","params":{"text":"hello"},"id"
   （插件仍可用，但 `?` 列表与 keyword 提示退化为默认占位）。
 - 依赖仅标准库：`Item`/协议层零第三方依赖；各插件自行管理业务依赖
   （如 `Flow.translate-youdao/requirements.txt` 中的 `requests`）。
+
+## 许可证
+
+WayRun-Plugin 采用双许可证，可任选其一：
+
+- **MIT** —— [LICENSE-MIT](../../LICENSE-MIT)
+- **Apache-2.0** —— [LICENSE-APACHE](../../LICENSE-APACHE)
+
+内置插件图标为 Google Material Symbols，采用 Apache License 2.0；
+署名与许可证全文见 [NOTICE](../../NOTICE)。
