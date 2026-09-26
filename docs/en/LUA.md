@@ -47,6 +47,7 @@ table in the wire shape is enough, for example
 | `wayrun.web_search_engine()` | the configured search engine, e.g. `"google"` |
 | `wayrun.time()` | Unix seconds, for signatures and cache TTLs |
 | `wayrun.env(name)` | the launcher process's variable `name`, or nil |
+| `wayrun.which(name)` | an executable's path on the launcher's `$PATH`, or nil; the same PATH a `run` row's command will see |
 | `wayrun.script_dir()` | the script's own directory, for an icon it ships |
 | `wayrun.plugin_dir(id)` | the directory a plugin may read from, `~/.config/wayrun/plugins/<id>` |
 | `wayrun.fs.read(name)` | a file under those directories; a relative name, nil when absent, an error when the name escapes |
@@ -57,15 +58,24 @@ table in the wire shape is enough, for example
 | `wayrun.http.get(url, params?, timeout_ms?)` | blocking GET, answering `{status, body}`; a transport error raises; `params` adds query values and takes a reserved `headers` table for request headers |
 | `wayrun.sqlite.snapshot(path)` | an immutable copy of a SQLite file, opened and returned as a handle |
 | `wayrun.sqlite.query(handle, sql, params?)` | rows as tables; a NULL column reads as absent |
+| `wayrun.kv.get(key)` | a stored string, or nil when absent or expired |
+| `wayrun.kv.set(key, value, ttl_secs?)` | stores a string under `key`; with a ttl it expires; the store is a sqlite database in the plugin's own directory |
+| `wayrun.kv.delete(key)` | drops a key |
+| `wayrun.fuzzy.match(query, candidates)` | `{index, kind}` hits, best first, over an array of strings; the kinds are the launcher's own (exact, prefix, word, substring, loose) |
 
 ## The sandbox
 
 `os`, `io`, `package`, `load` and `print` are not reachable: a script cannot
-run programs, and the only files it can read are its own, through `fs.read`,
-confined to `~/.config/wayrun/plugins/<id>/`; the launcher's environment,
-through `wayrun.env`, is the one other part of its process a script can touch.
-A call that raises yields no rows and reports to the journal, so `wayrun.log`
-and a `pcall` around risky work are the debugging tools.
+run programs, and the only write is `kv`, whose keys are not paths and whose
+database lives in the plugin's own directory. Reading is wider: `fs.read` is
+the scoped one (relative names only, confined to
+`~/.config/wayrun/plugins/<id>/`), while `fs.list` and `fs.stat` take any path
+for names and metadata, `sqlite.snapshot` copies any SQLite file for querying
+(`firefox.lua` reads `places.sqlite` this way), `wayrun.env` reads the
+launcher's environment, and `http.get` reaches the network. The sandbox bounds
+what a script can do, not what it can read. A call that raises yields no rows
+and reports to the journal, so `wayrun.log` and a `pcall` around risky work are
+the debugging tools.
 
 ## Limits
 

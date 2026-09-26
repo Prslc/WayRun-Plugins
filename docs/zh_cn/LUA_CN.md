@@ -45,6 +45,7 @@ return {
 | `wayrun.web_search_engine()` | 配置的搜索引擎，如 `"google"` |
 | `wayrun.time()` | Unix 秒，用于签名与缓存 TTL |
 | `wayrun.env(name)` | 启动器进程的环境变量 `name`，否则 nil |
+| `wayrun.which(name)` | 启动器 `$PATH` 上某个可执行文件的路径，否则 nil；与 `run` 行的命令将看到的 PATH 相同 |
 | `wayrun.script_dir()` | 脚本自身所在目录，用于携带图标等文件 |
 | `wayrun.plugin_dir(id)` | 插件可读目录：`~/.config/wayrun/plugins/<id>` |
 | `wayrun.fs.read(name)` | 读取上述目录中的文件；相对名，缺失返回 nil，越界报错 |
@@ -55,13 +56,21 @@ return {
 | `wayrun.http.get(url, params?, timeout_ms?)` | 阻塞式 GET，返回 `{status, body}`；传输错误抛出；`params` 追加查询参数，其保留键 `headers` 为请求头表 |
 | `wayrun.sqlite.snapshot(path)` | 打开一份 SQLite 文件的不可变副本，返回句柄 |
 | `wayrun.sqlite.query(handle, sql, params?)` | 行以表返回；NULL 列读作缺失 |
+| `wayrun.kv.get(key)` | 取回存的字符串；缺失或已过期则为 nil |
+| `wayrun.kv.set(key, value, ttl_secs?)` | 在 `key` 下存一个字符串；给了 ttl 会过期；库是插件自己目录里的一个 sqlite |
+| `wayrun.kv.delete(key)` | 删掉一个键 |
+| `wayrun.fuzzy.match(query, candidates)` | 对字符串数组返回 `{index, kind}` 命中，最优在前；kind 就是启动器自己的匹配词汇（exact、prefix、word、substring、loose） |
 
 ## 沙箱
 
-`os`、`io`、`package`、`load` 与 `print` 均不可达：脚本起不了进程；能读的文件只有
-自己的——经 `fs.read`、限定在 `~/.config/wayrun/plugins/<id>/` 之内；启动器的环境
-变量（`wayrun.env`）是脚本能触及的、启动器进程的另一处信息。调用中抛错则本次返回空
-行并记录到 journal，因此 `wayrun.log` 与对风险操作的 `pcall` 就是调试手段。
+`os`、`io`、`package`、`load` 与 `print` 均不可达：脚本起不了进程，唯一的写是
+`kv`（键不是路径，库落在插件自己的目录里）。能读的比这宽：`fs.read` 是受范围约束
+的那一个（只收相对路径，限定在 `~/.config/wayrun/plugins/<id>/` 之内），而
+`fs.list` 与 `fs.stat` 可对任意路径取名字与元数据，`sqlite.snapshot` 可把任意
+SQLite 文件拷为副本整体查询（`firefox.lua` 就是这样读 `places.sqlite` 的），
+`wayrun.env` 可读启动器的环境变量，`http.get` 可访问网络。沙箱约束的是脚本能做
+什么，而不是能读什么。调用中抛错则本次返回空行并记录到 journal，因此 `wayrun.log`
+与对风险操作的 `pcall` 就是调试手段。
 
 ## 限制
 
