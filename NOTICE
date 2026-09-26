@@ -1,20 +1,18 @@
 Embedded plugin icons
 =====================
 
-The `icon.svg` files in `github/`, `todo/`, `translate_youdao/` and `template/`
-are Google Material Symbols
+The `icon.svg` files in `example/python/github/`, `example/python/todo/` and
+`template/` are Google Material Symbols
 (https://fonts.google.com/icons, https://github.com/google/material-design-icons),
 used as the plugin identities so each host ships its own icon instead of naming a
 theme icon. The path data is unmodified; a fixed flat-palette fill colour was
-added. `base64/icon.png`, `bilibili_search/icon.png` and `cc/icon.svg` are
-original artwork and carry no third-party licence.
+added.
 
-File                       Source
--------------------------  --------------------
-github/icon.svg            code
-todo/icon.svg              task_alt
-translate_youdao/icon.svg  translate
-template/icon.svg          star
+File                            Source
+------------------------------  --------------------
+example/python/github/icon.svg  code
+example/python/todo/icon.svg    task_alt
+template/icon.svg               star
 
 Each file below is Material Symbols under the Apache License, Version 2.0.
 

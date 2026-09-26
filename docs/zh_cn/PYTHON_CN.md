@@ -5,6 +5,8 @@
 
 ## 快速开始
 
+在工作区根目录执行：
+
 ```sh
 cp -r template my-plugin
 # 编辑 my-plugin/main.py
@@ -48,6 +50,10 @@ def search(text: str) -> list[Item]:
 
 plugin.run()
 ```
+
+bootstrap 的 `parents[N]` 必须指向工作区根（含 `wayrun_plugin/` 的目录）：插件目录
+直接在根下时用 `parents[1]`（即 `cp -r template` 得到的布局），
+`example/python/<插件>/` 下的示例嵌套三层，用 `parents[3]`。
 
 ## API 参考
 
@@ -110,8 +116,8 @@ Item(
 )
 ```
 
-`ephemeral=True` 要求后端不把该行记入使用历史，适合一次性的搜索命中（github
-插件就是这么标记仓库结果的）。
+`ephemeral=True` 要求后端不把该行记入使用历史，适合一次性的搜索命中（
+`example/python/github/` 示例就是这么标记仓库结果的）。
 
 ### 图标
 

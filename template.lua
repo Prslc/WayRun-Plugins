@@ -11,7 +11,7 @@
 --     resident = true    # keep one host process warm between calls
 --
 -- The full surface (wayrun.sqlite, wayrun.http, wayrun.fs, wayrun.t, ...) is
--- documented in this workspace's LUA.md.
+-- documented in this workspace's docs/en/LUA.md.
 
 return {
   {

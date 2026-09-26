@@ -83,5 +83,5 @@ command = "/absolute/path/to/my-plugin.lua"
 resident = true           # 跨调用保留主机进程
 ```
 
-脚本首行必须是 `#!/usr/bin/env -S wayrun --lua-host`。本工作区的 `firefox.lua` 与
-`web.lua` 是两个完整示例，分别读取 `places.sqlite` 与网页。
+脚本首行必须是 `#!/usr/bin/env -S wayrun --lua-host`。`example/lua/firefox.lua` 与
+`example/lua/web.lua` 是两个完整示例，分别读取 `places.sqlite` 与网页。

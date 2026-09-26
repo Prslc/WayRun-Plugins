@@ -88,6 +88,6 @@ resident = true           # keep the host warm between calls
 ```
 
 The first line of the script must be
-`#!/usr/bin/env -S wayrun --lua-host`. This workspace's `firefox.lua` and
-`web.lua` are complete worked examples, reading `places.sqlite` and the web
-respectively.
+`#!/usr/bin/env -S wayrun --lua-host`. `example/lua/firefox.lua` and
+`example/lua/web.lua` are complete worked examples, reading `places.sqlite`
+and the web respectively.

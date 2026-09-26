@@ -14,17 +14,20 @@ wayrun-plugin/
 │   ├── _plugin.py          #   Plugin (the decorators)
 │   └── _server.py          #   Server / serve (the JSON-RPC loop)
 ├── template/               # cp -r template <new-plugin>; ships icon.svg
-├── template.lua            # Lua plugin skeleton (one file; see Lua plugins)
-├── PYTHON.md               # Python plugin guide: quick start, API reference
-├── LUA.md                  # Lua plugin guide: contract, wayrun table, sandbox
+├── template.lua            # Lua plugin skeleton (one file)
+├── example/                # worked examples
+│   ├── python/
+│   │   ├── github/         #   GitHub repository search
+│   │   └── todo/           #   full example: todo manager
+│   └── lua/
+│       ├── firefox.lua     #   Firefox bookmarks and history (one host)
+│       └── web.lua         #   search-engine suggestions
+├── docs/en/                # PYTHON.md, LUA.md
+├── docs/zh_cn/             # README_CN.md, PYTHON_CN.md, LUA_CN.md
 ├── tests/test_host.py      # framework protocol contract tests (unittest)
 ├── ruff.toml               # lint + format config
 ├── pyrightconfig.json      # LSP config
-├── NOTICE                  # bundled-icon attribution (Material Symbols)
-├── github/                 # example: GitHub repository search
-├── todo/                   # full example: todo manager
-├── firefox.lua             # example: Firefox bookmarks and history, in Lua
-└── web.lua                 # example: search-engine suggestions, in Lua
+└── NOTICE                  # bundled-icon attribution (Material Symbols)
 ```
 
 Plugins are independent of each other and only share the `wayrun_plugin`
@@ -37,13 +40,17 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 ```
 
-so a plugin directory must be a direct child of the workspace root.
+so the bootstrap must reach the workspace root: `parents[1]` when the plugin
+directory sits directly under the root (the layout `template/` ships),
+`parents[3]` for the examples nested at `example/python/<plugin>/`.
 
 ## Python plugins
 
 A plugin is one directory: copy `template/`, edit `main.py`, register it in
 `plugins.toml`, and the framework owns the stdin/stdout JSON-RPC 2.0 transport.
-The quick start and the full API reference are in [PYTHON.md](PYTHON.md).
+The quick start and the full API reference are in
+[docs/en/PYTHON.md](docs/en/PYTHON.md); `example/python/` holds the two worked
+examples.
 
 ## Lua plugins
 
@@ -51,9 +58,10 @@ A plugin can also be one Lua script — no framework, no Python install. The
 WayRun binary hosts it itself (`wayrun --lua-host`), answering the same
 JSON-RPC surface a Python host does, so it starts in milliseconds.
 
-[LUA.md](LUA.md) has the script contract, the full `wayrun` table, the sandbox
-and registration. This workspace's `firefox.lua` and `web.lua` are complete
-worked examples, reading `places.sqlite` and the web respectively.
+[docs/en/LUA.md](docs/en/LUA.md) has the script contract, the full `wayrun`
+table, the sandbox and registration. `example/lua/firefox.lua` (a host with two
+plugins) and `example/lua/web.lua` are complete worked examples, reading
+`places.sqlite` and the web respectively.
 
 ## Protocol
 

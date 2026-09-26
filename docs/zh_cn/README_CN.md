@@ -15,17 +15,20 @@ wayrun-plugin/
 │   ├── _plugin.py          #   Plugin（装饰器）
 │   └── _server.py          #   Server / serve（JSON-RPC 循环）
 ├── template/               # cp -r template <新插件目录>；自带 icon.svg
-├── template.lua            # Lua 插件骨架（单文件，见「Lua 插件」）
-├── PYTHON.md               # Python 插件指南：快速开始、API 参考
-├── LUA.md                  # Lua 插件指南：契约、wayrun 表、沙箱
+├── template.lua            # Lua 插件骨架（单文件）
+├── example/                # 完整示例
+│   ├── python/
+│   │   ├── github/         #   GitHub 仓库搜索
+│   │   └── todo/           #   完整示范：待办管理
+│   └── lua/
+│       ├── firefox.lua     #   Firefox 书签与历史（一个主机）
+│       └── web.lua         #   搜索引擎联想词
+├── docs/en/                # PYTHON.md、LUA.md
+├── docs/zh_cn/             # README_CN.md、PYTHON_CN.md、LUA_CN.md
 ├── tests/test_host.py      # 框架协议契约测试（unittest，无第三方依赖）
 ├── ruff.toml               # 代码风格配置
 ├── pyrightconfig.json      # LSP 配置
-├── NOTICE                  # 内置图标署名（Material Symbols）
-├── github/                 # 示例：GitHub 仓库搜索
-├── todo/                   # 完整示范：待办管理
-├── firefox.lua             # 示例：Firefox 书签与历史（Lua）
-└── web.lua                 # 示例：搜索引擎联想词（Lua）
+└── NOTICE                  # 内置图标署名（Material Symbols）
 ```
 
 插件目录之间互不依赖，只共享根目录的 `wayrun_plugin` 包。每个插件的
@@ -38,7 +41,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 ```
 
-因此插件目录必须是工作区根的**直接子目录**。
+即 bootstrap 必须指向工作区根：插件目录是工作区根的**直接子目录**时用
+`parents[1]`（`template/` 采用的布局）；`example/python/<插件>/` 下的示例嵌套
+三层，用 `parents[3]`。
 
 ## Python 插件
 
@@ -51,8 +56,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 插件也可以就是一个 Lua 脚本——无框架、无需安装 Python。WayRun 二进制自身承载
 它（`wayrun --lua-host`），与 Python 主机讲同一套 JSON-RPC 接口，启动只需毫秒级。
 
-脚本契约、完整的 `wayrun` 表、沙箱与注册见 [LUA_CN.md](LUA_CN.md)。本工作区的
-`firefox.lua` 与 `web.lua` 是两个完整示例，分别读取 `places.sqlite` 与网页。
+脚本契约、完整的 `wayrun` 表、沙箱与注册见 [LUA_CN.md](LUA_CN.md)。
+`example/lua/firefox.lua`（一个主机两个插件）与 `example/lua/web.lua` 是两个完整
+示例，分别读取 `places.sqlite` 与网页。
 
 ## 框架代管的协议行为
 
