@@ -9,19 +9,19 @@ one script file hosted by the WayRun binary.
 ```
 wayrun-plugin/
 ├── wayrun_plugin/          # shared framework
-│   ├── __init__.py         #   public API + __version__
-│   ├── _item.py            #   Item, the command builders, hint, split_command
-│   ├── _plugin.py          #   Plugin (the decorators)
-│   └── _server.py          #   Server / serve (the JSON-RPC loop)
+│   ├── __init__.py         # public API + __version__
+│   ├── _item.py            # Item, the command builders, hint, split_command
+│   ├── _plugin.py          # Plugin (the decorators)
+│   └── _server.py          # Server / serve (the JSON-RPC loop)
 ├── template/               # cp -r template <new-plugin>; ships icon.svg
 ├── template.lua            # Lua plugin skeleton (one file)
 ├── example/                # worked examples
 │   ├── python/
-│   │   ├── github/         #   GitHub repository search
-│   │   └── todo/           #   full example: todo manager
+│   │   ├── github/         # GitHub repository search
+│   │   └── todo/           # full example: todo manager
 │   └── lua/
-│       ├── firefox.lua     #   Firefox bookmarks and history (one host)
-│       └── web.lua         #   search-engine suggestions
+│       ├── firefox.lua     # Firefox bookmarks and history (one host)
+│       └── web.lua         # search-engine suggestions
 ├── docs/en/                # PYTHON.md, LUA.md
 ├── docs/zh_cn/             # README_CN.md, PYTHON_CN.md, LUA_CN.md
 ├── tests/test_host.py      # framework protocol contract tests (unittest)

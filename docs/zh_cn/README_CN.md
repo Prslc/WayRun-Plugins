@@ -10,19 +10,19 @@ English: [README.md](../../README.md)
 ```
 wayrun-plugin/
 ├── wayrun_plugin/          # 共享框架
-│   ├── __init__.py         #   公共 API 与 __version__
-│   ├── _item.py            #   Item、命令构造器、hint、split_command
-│   ├── _plugin.py          #   Plugin（装饰器）
-│   └── _server.py          #   Server / serve（JSON-RPC 循环）
+│   ├── __init__.py         # 公共 API 与 __version__
+│   ├── _item.py            # Item、命令构造器、hint、split_command
+│   ├── _plugin.py          # Plugin（装饰器）
+│   └── _server.py          # Server / serve（JSON-RPC 循环）
 ├── template/               # cp -r template <新插件目录>；自带 icon.svg
 ├── template.lua            # Lua 插件骨架（单文件）
 ├── example/                # 完整示例
 │   ├── python/
-│   │   ├── github/         #   GitHub 仓库搜索
-│   │   └── todo/           #   完整示范：待办管理
+│   │   ├── github/         # GitHub 仓库搜索
+│   │   └── todo/           # 完整示范：待办管理
 │   └── lua/
-│       ├── firefox.lua     #   Firefox 书签与历史（一个主机）
-│       └── web.lua         #   搜索引擎联想词
+│       ├── firefox.lua     # Firefox 书签与历史（一个主机）
+│       └── web.lua         # 搜索引擎联想词
 ├── docs/en/                # PYTHON.md、LUA.md
 ├── docs/zh_cn/             # README_CN.md、PYTHON_CN.md、LUA_CN.md
 ├── tests/test_host.py      # 框架协议契约测试（unittest，无第三方依赖）
