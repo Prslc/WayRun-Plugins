@@ -22,7 +22,9 @@ wayrun-plugin/
 ├── pyrightconfig.json      # LSP 配置
 ├── NOTICE                  # 内置图标署名（Material Symbols）
 ├── github/                 # 示例：GitHub 仓库搜索
-└── todo/                   # 完整示范：待办管理
+├── todo/                   # 完整示范：待办管理
+├── firefox.lua             # 示例：Firefox 书签与历史（Lua）
+└── web.lua                 # 示例：搜索引擎联想词（Lua）
 ```
 
 插件目录之间互不依赖，只共享根目录的 `wayrun_plugin` 包。每个插件的
@@ -119,8 +121,7 @@ resident = true           # 跨调用保留主机进程
 
 完整能力面（`wayrun.sqlite`、`wayrun.http`、`wayrun.fs`、`wayrun.t`……）见主仓库
 [docs/zh_cn/lua.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/lua.md)。
-启动器自带的 `firefox.lua` 与 `web.lua` 是两个完整示例。
-
+本工作区的 `firefox.lua` 与 `web.lua` 是两个完整示例。
 ## API 参考
 
 ### `@plugin.search(**meta)`

@@ -22,7 +22,9 @@ wayrun-plugin/
 ├── pyrightconfig.json      # LSP config
 ├── NOTICE                  # bundled-icon attribution (Material Symbols)
 ├── github/                 # example: GitHub repository search
-└── todo/                   # full example: todo manager
+├── todo/                   # full example: todo manager
+├── firefox.lua             # example: Firefox bookmarks and history, in Lua
+└── web.lua                 # example: search-engine suggestions, in Lua
 ```
 
 Plugins are independent of each other and only share the `wayrun_plugin`
@@ -123,7 +125,7 @@ resident = true           # keep the host warm between calls
 The full surface (`wayrun.sqlite`, `wayrun.http`, `wayrun.fs`, `wayrun.t`,
 …) is documented in the main repository:
 [docs/en/lua.md](https://github.com/Prslc/WayRun/blob/main/docs/en/lua.md).
-The launcher's own `firefox.lua` and `web.lua` are complete worked examples.
+This workspace's `firefox.lua` and `web.lua` are complete worked examples.
 
 ## API
 
