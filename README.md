@@ -84,6 +84,47 @@ def search(text: str) -> list[Item]:
 plugin.run()
 ```
 
+## Lua plugins
+
+A plugin can also be one Lua script — no framework, no Python install. The
+WayRun binary hosts it itself (`wayrun --lua-host`), so it starts in
+milliseconds, and everything the launcher provides is reachable through one
+`wayrun` table:
+
+```lua
+#!/usr/bin/env -S wayrun --lua-host
+return {
+  {
+    id = "my-plugin",                    -- must match the plugins.toml id
+    name = "My Plugin",
+    icon = wayrun.icon("builtin:globe"), -- an absolute path, or nil
+    description = "Short description",
+    search = function(text)
+      return {
+        { title = "You searched: " .. text,
+          on_click = { type = "copy", text = text } },
+      }
+    end,
+  },
+}
+```
+
+Copy `template.lua`, keep the shebang and the exec bit, and register it like
+any host:
+
+```toml
+[[plugins]]
+id = "my-plugin"          # must match the returned plugin id
+keyword = "mp"
+command = "/absolute/path/to/my-plugin.lua"
+resident = true           # keep the host warm between calls
+```
+
+The full surface (`wayrun.sqlite`, `wayrun.http`, `wayrun.fs`, `wayrun.t`,
+…) is documented in the main repository:
+[docs/en/lua.md](https://github.com/Prslc/WayRun/blob/main/docs/en/lua.md).
+The launcher's own `firefox.lua` and `web.lua` are complete worked examples.
+
 ## API
 
 ### `@plugin.search(**meta)`
@@ -172,6 +213,7 @@ string. The helpers build one; import them from `wayrun_plugin`:
 | Helper | Command |
 |--------|---------|
 | `run(cmd)` | run `cmd` through a shell |
+| `run_in_terminal(cmd)` | run `cmd` in a terminal emulator (for a tty-bound binary) |
 | `open_uri(uri)` | open a URL / `file:` / `mailto:` URI with the default handler |
 | `copy_text(text)` | write `text` to the Wayland clipboard |
 | `launch(desktop_id)` | launch an app by desktop id |
@@ -210,6 +252,11 @@ positional routing (like the cc plugin) just uses `text.split()`.
 The last line of `main.py`. Blocks reading stdin until EOF, answering `ping`,
 `list_plugins`, `search`, `top`, and every registered method. A request
 without an `id` is a notification and produces no response.
+
+The loop serves until EOF, so the same host works both ways: forked per call
+(one request, stdin closes) and, with `resident = true` in `plugins.toml`,
+kept warm across calls — about 0.1ms per call instead of the ~40ms a fresh
+interpreter costs.
 
 ### `Plugin`, `Server`, `serve` (advanced)
 

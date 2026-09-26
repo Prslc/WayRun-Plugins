@@ -30,6 +30,7 @@ from ._item import (
     open_uri,
     reveal,
     run,
+    run_in_terminal,
     split_command,
     terminal,
 )
@@ -50,6 +51,7 @@ __all__ = [
     "open_uri",
     "reveal",
     "run",
+    "run_in_terminal",
     "split_command",
     "terminal",
     "Plugin",

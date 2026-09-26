@@ -83,6 +83,44 @@ def search(text: str) -> list[Item]:
 plugin.run()
 ```
 
+## Lua 插件
+
+插件也可以就是一个 Lua 脚本——无框架、无需安装 Python。WayRun 二进制自身承载
+它（`wayrun --lua-host`），启动只需毫秒级，启动器的一切能力都通过一张
+`wayrun` 表可达：
+
+```lua
+#!/usr/bin/env -S wayrun --lua-host
+return {
+  {
+    id = "my-plugin",                    -- 必须与 plugins.toml 条目一致
+    name = "My Plugin",
+    icon = wayrun.icon("builtin:globe"), -- 绝对路径，或 nil
+    description = "简短描述",
+    search = function(text)
+      return {
+        { title = "You searched: " .. text,
+          on_click = { type = "copy", text = text } },
+      }
+    end,
+  },
+}
+```
+
+复制 `template.lua`，保留 shebang 与执行位，像任何主机一样注册：
+
+```toml
+[[plugins]]
+id = "my-plugin"          # 必须与脚本返回的插件 id 一致
+keyword = "mp"
+command = "/绝对/路径/my-plugin.lua"
+resident = true           # 跨调用保留主机进程
+```
+
+完整能力面（`wayrun.sqlite`、`wayrun.http`、`wayrun.fs`、`wayrun.t`……）见主仓库
+[docs/zh_cn/lua.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/lua.md)。
+启动器自带的 `firefox.lua` 与 `web.lua` 是两个完整示例。
+
 ## API 参考
 
 ### `@plugin.search(**meta)`
@@ -164,6 +202,7 @@ Item(
 | 构造器 | 命令 |
 |--------|------|
 | `run(cmd)` | 通过 shell 执行 `cmd` |
+| `run_in_terminal(cmd)` | 在终端模拟器中执行 `cmd`（需要 tty 的程序用） |
 | `open_uri(uri)` | 用默认处理器打开 URL / `file:` / `mailto:` URI |
 | `copy_text(text)` | 写入 Wayland 剪贴板 |
 | `launch(desktop_id)` | 按 desktop id 启动应用 |
@@ -199,6 +238,10 @@ return [hint("金额无效：'abc'", "例：cc 100 usd cny")]
 
 `main.py` 最后一行。阻塞读 stdin 直到 EOF：应答 `ping` / `list_plugins` /
 `search` / `top` 与所有注册方法。无 `id` 的请求是 notification，不产生响应。
+
+循环服务到 EOF，因此同一个主机两种用法皆可：逐次 fork（一个请求后 stdin 关闭），
+或在 `plugins.toml` 中设 `resident = true` 后跨调用保温——每次调用约 0.1ms，
+而每次新起解释器要约 40ms。
 
 ### `Plugin`、`Server`、`serve`（进阶）
 

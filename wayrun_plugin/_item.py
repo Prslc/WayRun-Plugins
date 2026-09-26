@@ -45,6 +45,11 @@ def run(cmd: str) -> Command:
     return {"type": "run", "cmd": cmd}
 
 
+def run_in_terminal(cmd: str) -> Command:
+    """A command that runs ``cmd`` in a terminal emulator (for a tty-bound one)."""
+    return {"type": "run_in_terminal", "cmd": cmd}
+
+
 def open_uri(uri: str) -> Command:
     """A command that opens ``uri`` with the default handler (URL/file/mailto)."""
     return {"type": "open", "uri": uri}
