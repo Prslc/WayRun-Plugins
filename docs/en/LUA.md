@@ -54,7 +54,7 @@ table in the wire shape is enough, for example
 | `wayrun.json.decode(text)` / `wayrun.json.encode(value)` | JSON in and out |
 | `wayrun.fs.list(dir)` | entry names under `dir`, or nil |
 | `wayrun.fs.stat(path)` | `{ mtime_ns, size }`, or nil |
-| `wayrun.http.get(url, params?, timeout_ms?)` | blocking GET; `params` adds query values |
+| `wayrun.http.get(url, params?, timeout_ms?)` | blocking GET, answering `{status, body}`; a transport error raises; `params` adds query values and takes a reserved `headers` table for request headers |
 | `wayrun.sqlite.snapshot(path)` | an immutable copy of a SQLite file, opened and returned as a handle |
 | `wayrun.sqlite.query(handle, sql, params?)` | rows as tables; a NULL column reads as absent |
 

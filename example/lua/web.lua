@@ -61,8 +61,8 @@ return {
       if text == "" then
         return {}
       end
-      local body = wayrun.http.get(engine.suggest_url, { q = text }, 5000)
-      local payload = wayrun.json.decode(body)
+      local res = wayrun.http.get(engine.suggest_url, { q = text }, 5000)
+      local payload = wayrun.json.decode(res.body)
       local out = { row("Search: " .. text, text) }
       local suggestions = type(payload) == "table" and payload[2] or nil
       if type(suggestions) == "table" then

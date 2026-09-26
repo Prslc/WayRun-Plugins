@@ -52,7 +52,7 @@ return {
 | `wayrun.json.decode(text)` / `wayrun.json.encode(value)` | JSON 进出 |
 | `wayrun.fs.list(dir)` | `dir` 下的条目名，否则 nil |
 | `wayrun.fs.stat(path)` | `{ mtime_ns, size }`，否则 nil |
-| `wayrun.http.get(url, params?, timeout_ms?)` | 阻塞式 GET；`params` 追加查询参数 |
+| `wayrun.http.get(url, params?, timeout_ms?)` | 阻塞式 GET，返回 `{status, body}`；传输错误抛出；`params` 追加查询参数，其保留键 `headers` 为请求头表 |
 | `wayrun.sqlite.snapshot(path)` | 打开一份 SQLite 文件的不可变副本，返回句柄 |
 | `wayrun.sqlite.query(handle, sql, params?)` | 行以表返回；NULL 列读作缺失 |
 
