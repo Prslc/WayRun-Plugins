@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48" fill="none">
-  <!-- 渐变/双色浅底背景环 -->
-  <circle cx="24" cy="24" r="20" fill="#EFF6FF" stroke="#DBEAFE" stroke-width="2" />
-  
-  <!-- 主交换箭头 -->
-  <path d="M15 20h18m-5-5l5 5-5 5" stroke="#2563EB" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-  <path d="M33 28H15m5-5l-5 5 5 5" stroke="#93C5FD" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-</svg>

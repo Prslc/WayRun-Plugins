@@ -16,13 +16,13 @@ wayrun-plugin/
 │   ├── _plugin.py          #   Plugin (the decorators)
 │   └── _server.py          #   Server / serve (the JSON-RPC loop)
 ├── template/               # cp -r template <new-plugin>; ships icon.svg
+├── template.lua            # Lua plugin skeleton (one file; see Lua plugins)
 ├── tests/test_host.py      # framework protocol contract tests (unittest)
 ├── ruff.toml               # lint + format config
 ├── pyrightconfig.json      # LSP config
 ├── NOTICE                  # bundled-icon attribution (Material Symbols)
 ├── github/                 # example: GitHub repository search
-├── todo/                   # full example: todo manager
-├── base64/ bilibili_search/ cc/ translate_youdao/
+└── todo/                   # full example: todo manager
 ```
 
 Plugins are independent of each other and only share the `wayrun_plugin`
@@ -320,8 +320,8 @@ printf '%s\n' '{"jsonrpc":"2.0","method":"search","params":{"text":"hello"},"id"
   core ignores the identity (the plugin still works, but the `?` list and the
   keyword hint fall back to a placeholder).
 - Standard library only: `Item` and the protocol layer have no third-party
-  dependencies. Each plugin manages its own (for example
-  `Flow.translate-youdao/requirements.txt`).
+  dependencies. Each plugin manages its own (a plugin with extras can ship a
+  `requirements.txt` of its own).
 
 ## License
 

@@ -16,13 +16,13 @@ wayrun-plugin/
 │   ├── _plugin.py          #   Plugin（装饰器）
 │   └── _server.py          #   Server / serve（JSON-RPC 循环）
 ├── template/               # cp -r template <新插件目录>；自带 icon.svg
+├── template.lua            # Lua 插件骨架（单文件，见「Lua 插件」）
 ├── tests/test_host.py      # 框架协议契约测试（unittest，无第三方依赖）
 ├── ruff.toml               # 代码风格配置
 ├── pyrightconfig.json      # LSP 配置
 ├── NOTICE                  # 内置图标署名（Material Symbols）
 ├── github/                 # 示例：GitHub 仓库搜索
-├── todo/                   # 完整示范：待办管理
-├── base64/ bilibili_search/ cc/ translate_youdao/
+└── todo/                   # 完整示范：待办管理
 ```
 
 插件目录之间互不依赖，只共享根目录的 `wayrun_plugin` 包。每个插件的
@@ -302,7 +302,7 @@ printf '%s\n' '{"jsonrpc":"2.0","method":"search","params":{"text":"hello"},"id"
 - 修改 `@plugin.search` 的 `id` 时必须同步改 `plugins.toml`，否则核心忽略身份
   （插件仍可用，但 `?` 列表与 keyword 提示退化为默认占位）。
 - 依赖仅标准库：`Item`/协议层零第三方依赖；各插件自行管理业务依赖
-  （如 `Flow.translate-youdao/requirements.txt` 中的 `requests`）。
+  （插件可自带 `requirements.txt` 声明额外依赖）。
 
 ## 许可证
 
