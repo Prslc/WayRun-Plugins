@@ -20,6 +20,7 @@ return {
     icon = wayrun.icon("builtin:globe"), -- an absolute path, or nil
     description = "Does something useful",
     -- env = { "MY_TOKEN" },             -- the exact env names it may read
+    -- read = { "~/Documents" },         -- the areas it may look inside
 
     search = function(text)
       if text == "" then

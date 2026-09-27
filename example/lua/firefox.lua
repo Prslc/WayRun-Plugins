@@ -110,12 +110,15 @@ local function searcher(mode, icon)
   end
 end
 
+local AREAS = { "~/.mozilla/firefox", "~/.config/mozilla/firefox" }
+
 return {
   {
     id = "firefox-bookmarks",
     name = "Bookmarks",
     icon = bookmarks_icon,
     description = "Search Firefox bookmarks",
+    read = AREAS,
     search = searcher("bookmarks", bookmarks_icon),
   },
   {
@@ -123,6 +126,7 @@ return {
     name = "History",
     icon = history_icon,
     description = "Search Firefox history",
+    read = AREAS,
     search = searcher("history", history_icon),
   },
 }

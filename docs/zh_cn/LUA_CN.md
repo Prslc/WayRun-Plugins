@@ -33,10 +33,15 @@ return {
 `ephemeral`、`actions`、`badge`。不需要构造器——写成结果项形状的表即可，例如
 `on_click = { type = "open", uri = "https://example.com" }`。
 
-插件表同时就是它的 manifest：`env` 列出它可读的环境变量名，逐字匹配、不支持通配。
-名单之外的名字会抛出（与 `fs.read` 越界一致），声明了但没设置的返回 nil（与文件
-缺失一致）；读取归属于某次插件调用，脚本自身加载时读不到——脚本本来要从环境里取的
-路径，用 `wayrun.home()` 与 `wayrun.cache_dir()` 就够了。
+插件表同时就是它的 manifest：`env` 列出插件可读的环境变量名，必须逐个写全，不支持
+通配。读名单之外的名字会直接报错；声明了但进程里没设置的才返回 nil。env 只能在
+`search`/`top`/`forget` 这些插件调用里读，脚本加载（顶层代码）时读会报错——想在
+脚本里拿 home 或缓存目录，用 `wayrun.home()` 与 `wayrun.cache_dir()`，不必读环境。
+
+`read` 列出插件可以读取的区域：绝对路径或 `~/…`，同样逐个写全。每次读取都会解析
+symlink，区域内的符号链接无法把路径带出区域；`fs.list`、`fs.stat` 与
+`sqlite.snapshot` 遇到区域之外的路径直接报错，而插件自己的目录与脚本所在目录始终
+算在区域内。
 
 ## `wayrun` 表
 
@@ -57,15 +62,15 @@ return {
 | `wayrun.fs.read(name)` | 读取上述目录中的文件；相对名，缺失返回 nil，越界报错 |
 | `wayrun.toml.decode(text)` | TOML 进，表出 |
 | `wayrun.json.decode(text)` / `wayrun.json.encode(value)` | JSON 进出 |
-| `wayrun.fs.list(dir)` | `dir` 下的条目名，否则 nil |
-| `wayrun.fs.stat(path)` | `{ mtime_ns, size }`，否则 nil |
+| `wayrun.fs.list(dir)` | 声明区域内 `dir` 下的条目名，否则 nil |
+| `wayrun.fs.stat(path)` | 声明区域内路径的 `{ mtime_ns, size }`，否则 nil |
 | `wayrun.http.get(url, params?, options?)` | 阻塞式 GET，返回 `{status, headers, body}`；传输错误抛出；`params` 追加查询参数，其保留键 `headers` 为请求头表；`options` 是带 `timeout_ms`、`headers`、`ttl` 的表，或直接给一个毫秒数作超时 |
 | `wayrun.http.post(url, params?, options?)` | 同上，发送一个 body：`json = value`、`form = {…}` 或 `body = "…"` 三选一；永不缓存 |
 | `wayrun.crypto.sha256(text)` / `wayrun.crypto.md5(text)` | 小写十六进制摘要 |
 | `wayrun.crypto.hmac_sha256(key, text)` | 小写十六进制 HMAC |
 | `wayrun.crypto.base64_encode(data)` / `wayrun.crypto.base64_decode(text)` | 对原始字节做 base64 编解码；解码对垃圾输入返回 nil |
-| `wayrun.sqlite.snapshot(path)` | 打开一份 SQLite 文件的不可变副本，返回句柄；同一文件返回同一句柄，句柄跟随其最新副本 |
-| `wayrun.sqlite.query(handle, sql, params?)` | 行以表返回；NULL 列读作缺失 |
+| `wayrun.sqlite.snapshot(path)` | 打开一份声明区域内 SQLite 文件的不可变副本，返回句柄；同一文件返回同一句柄，句柄跟随其最新副本 |
+| `wayrun.sqlite.query(handle, sql, params?)` | 行以表返回；NULL 列读作缺失；查询也受区域限制：句柄的来源文件必须在调用插件的声明区域内 |
 | `wayrun.kv.get(key)` | 取回存的字符串；缺失或已过期则为 nil |
 | `wayrun.kv.set(key, value, ttl_secs?)` | 在 `key` 下存一个字符串；给了 ttl 会过期；库是插件自己目录里的一个 sqlite |
 | `wayrun.kv.delete(key)` | 删掉一个键 |
@@ -82,10 +87,10 @@ return {
 `os`、`io`、`package`、`load` 与 `print` 均不可达：脚本起不了进程，唯一的写是
 `kv`（键不是路径，库落在插件自己的目录里）。能读的比这宽：`fs.read` 是受范围约束
 的那一个（只收相对路径，限定在 `~/.config/wayrun/plugins/<id>/` 之内），而
-`fs.list` 与 `fs.stat` 可对任意路径取名字与元数据，`sqlite.snapshot` 可把任意
-SQLite 文件拷为副本整体查询（`firefox.lua` 就是这样读 `places.sqlite` 的），
-`wayrun.env` 只能读调用中的插件自己声明的那些名字，`http` 可访问网络。沙箱约束的是脚本能做
-什么，而不是能读什么。调用中抛错则本次返回空行并记录到 journal，因此 `wayrun.log`
+`fs.list`、`fs.stat` 与 `sqlite.snapshot` 只能触及插件自己声明的区域（`firefox.lua`
+声明 `~/.mozilla/firefox` 来读 `places.sqlite`），`wayrun.env` 只能读调用中的插件
+自己声明的那些名字，`http` 可访问网络。沙箱约束的是脚本能做什么；能读到什么，由
+插件表的 `env` 与 `read` 声明。调用中抛错则本次返回空行并记录到 journal，因此 `wayrun.log`
 与对风险操作的 `pcall` 就是调试手段。
 
 ## 限制
