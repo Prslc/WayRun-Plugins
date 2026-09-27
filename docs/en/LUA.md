@@ -55,13 +55,25 @@ table in the wire shape is enough, for example
 | `wayrun.json.decode(text)` / `wayrun.json.encode(value)` | JSON in and out |
 | `wayrun.fs.list(dir)` | entry names under `dir`, or nil |
 | `wayrun.fs.stat(path)` | `{ mtime_ns, size }`, or nil |
-| `wayrun.http.get(url, params?, timeout_ms?)` | blocking GET, answering `{status, body}`; a transport error raises; `params` adds query values and takes a reserved `headers` table for request headers |
-| `wayrun.sqlite.snapshot(path)` | an immutable copy of a SQLite file, opened and returned as a handle |
+| `wayrun.http.get(url, params?, options?)` | blocking GET answering `{status, headers, body}`; a transport error raises; `params` adds query values and takes a reserved `headers` table; `options` is a table with `timeout_ms`, `headers` and `ttl`, or a bare timeout in ms |
+| `wayrun.http.post(url, params?, options?)` | the same, sending one body: `json = value`, `form = {…}` or `body = "…"`; never cached |
+| `wayrun.crypto.sha256(text)` / `wayrun.crypto.md5(text)` | lowercase hex digest |
+| `wayrun.crypto.hmac_sha256(key, text)` | lowercase hex HMAC |
+| `wayrun.crypto.base64_encode(data)` / `wayrun.crypto.base64_decode(text)` | base64 both ways over raw bytes; decode answers nil on garbage |
+| `wayrun.sqlite.snapshot(path)` | an immutable copy of a SQLite file, opened and returned as a handle; one file answers one handle and the handle follows its newest copy |
 | `wayrun.sqlite.query(handle, sql, params?)` | rows as tables; a NULL column reads as absent |
 | `wayrun.kv.get(key)` | a stored string, or nil when absent or expired |
 | `wayrun.kv.set(key, value, ttl_secs?)` | stores a string under `key`; with a ttl it expires; the store is a sqlite database in the plugin's own directory |
 | `wayrun.kv.delete(key)` | drops a key |
+| `wayrun.kv.keys(prefix?)` / `wayrun.kv.pairs(prefix?)` | the unexpired keys, or `{key, value}` records, under a prefix, ordered by key |
 | `wayrun.fuzzy.match(query, candidates)` | `{index, kind}` hits, best first, over an array of strings; the kinds are the launcher's own (exact, prefix, word, substring, loose) |
+
+`http.get` with a `ttl` answers a repeated call from the plugin's own store
+instead of the network — a 2xx text reply only, which is what makes a
+per-keystroke query affordable. Replies carry the body as raw bytes and
+lowercase response header names, and a timeout (two seconds by default) is
+capped inside the host call's own ceiling, so a slow endpoint raises an error
+for `pcall` rather than dying as a killed host.
 
 ## The sandbox
 
@@ -72,7 +84,7 @@ the scoped one (relative names only, confined to
 `~/.config/wayrun/plugins/<id>/`), while `fs.list` and `fs.stat` take any path
 for names and metadata, `sqlite.snapshot` copies any SQLite file for querying
 (`firefox.lua` reads `places.sqlite` this way), `wayrun.env` reads the
-launcher's environment, and `http.get` reaches the network. The sandbox bounds
+launcher's environment, and `http` reaches the network. The sandbox bounds
 what a script can do, not what it can read. A call that raises yields no rows
 and reports to the journal, so `wayrun.log` and a `pcall` around risky work are
 the debugging tools.

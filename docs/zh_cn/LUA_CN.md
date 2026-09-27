@@ -53,13 +53,23 @@ return {
 | `wayrun.json.decode(text)` / `wayrun.json.encode(value)` | JSON 进出 |
 | `wayrun.fs.list(dir)` | `dir` 下的条目名，否则 nil |
 | `wayrun.fs.stat(path)` | `{ mtime_ns, size }`，否则 nil |
-| `wayrun.http.get(url, params?, timeout_ms?)` | 阻塞式 GET，返回 `{status, body}`；传输错误抛出；`params` 追加查询参数，其保留键 `headers` 为请求头表 |
-| `wayrun.sqlite.snapshot(path)` | 打开一份 SQLite 文件的不可变副本，返回句柄 |
+| `wayrun.http.get(url, params?, options?)` | 阻塞式 GET，返回 `{status, headers, body}`；传输错误抛出；`params` 追加查询参数，其保留键 `headers` 为请求头表；`options` 是带 `timeout_ms`、`headers`、`ttl` 的表，或直接给一个毫秒数作超时 |
+| `wayrun.http.post(url, params?, options?)` | 同上，发送一个 body：`json = value`、`form = {…}` 或 `body = "…"` 三选一；永不缓存 |
+| `wayrun.crypto.sha256(text)` / `wayrun.crypto.md5(text)` | 小写十六进制摘要 |
+| `wayrun.crypto.hmac_sha256(key, text)` | 小写十六进制 HMAC |
+| `wayrun.crypto.base64_encode(data)` / `wayrun.crypto.base64_decode(text)` | 对原始字节做 base64 编解码；解码对垃圾输入返回 nil |
+| `wayrun.sqlite.snapshot(path)` | 打开一份 SQLite 文件的不可变副本，返回句柄；同一文件返回同一句柄，句柄跟随其最新副本 |
 | `wayrun.sqlite.query(handle, sql, params?)` | 行以表返回；NULL 列读作缺失 |
 | `wayrun.kv.get(key)` | 取回存的字符串；缺失或已过期则为 nil |
 | `wayrun.kv.set(key, value, ttl_secs?)` | 在 `key` 下存一个字符串；给了 ttl 会过期；库是插件自己目录里的一个 sqlite |
 | `wayrun.kv.delete(key)` | 删掉一个键 |
+| `wayrun.kv.keys(prefix?)` / `wayrun.kv.pairs(prefix?)` | 前缀下未过期的键（或 `{key, value}` 记录），按 key 排序 |
 | `wayrun.fuzzy.match(query, candidates)` | 对字符串数组返回 `{index, kind}` 命中，最优在前；kind 就是启动器自己的匹配词汇（exact、prefix、word、substring、loose） |
+
+`http.get` 带 `ttl` 时，重复调用由插件自己的存储应答而不是网络——只缓存 2xx 的
+文本响应，这正是"每击键一次查询"能负担得起的原因。返回的 body 是原始字节，响应头
+名小写；超时默认两秒，并被钳在宿主调用自身的上限之内，因此慢端点会抛出可被
+`pcall` 的错误，而不是以"宿主被杀"告终。
 
 ## 沙箱
 
@@ -68,7 +78,7 @@ return {
 的那一个（只收相对路径，限定在 `~/.config/wayrun/plugins/<id>/` 之内），而
 `fs.list` 与 `fs.stat` 可对任意路径取名字与元数据，`sqlite.snapshot` 可把任意
 SQLite 文件拷为副本整体查询（`firefox.lua` 就是这样读 `places.sqlite` 的），
-`wayrun.env` 可读启动器的环境变量，`http.get` 可访问网络。沙箱约束的是脚本能做
+`wayrun.env` 可读启动器的环境变量，`http` 可访问网络。沙箱约束的是脚本能做
 什么，而不是能读什么。调用中抛错则本次返回空行并记录到 journal，因此 `wayrun.log`
 与对风险操作的 `pcall` 就是调试手段。
 
