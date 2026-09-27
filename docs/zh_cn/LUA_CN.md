@@ -16,6 +16,7 @@ return {
     name = "My Plugin",
     icon = wayrun.icon("builtin:globe"), -- 绝对路径，或 nil
     description = "简短描述",
+    env = { "MY_TOKEN" },                -- 可读的环境变量名
     search = function(text)              -- 路由查询的候选行，按序返回
       return {
         { title = "You searched: " .. text,
@@ -32,6 +33,11 @@ return {
 `ephemeral`、`actions`、`badge`。不需要构造器——写成结果项形状的表即可，例如
 `on_click = { type = "open", uri = "https://example.com" }`。
 
+插件表同时就是它的 manifest：`env` 列出它可读的环境变量名，逐字匹配、不支持通配。
+名单之外的名字会抛出（与 `fs.read` 越界一致），声明了但没设置的返回 nil（与文件
+缺失一致）；读取归属于某次插件调用，脚本自身加载时读不到——脚本本来要从环境里取的
+路径，用 `wayrun.home()` 与 `wayrun.cache_dir()` 就够了。
+
 ## `wayrun` 表
 
 | 调用 | 作用 |
@@ -44,7 +50,7 @@ return {
 | `wayrun.log(message)` | 以脚本名义写入启动器的 journal |
 | `wayrun.web_search_engine()` | 配置的搜索引擎，如 `"google"` |
 | `wayrun.time()` | Unix 秒，用于签名与缓存 TTL |
-| `wayrun.env(name)` | 启动器进程的环境变量 `name`，否则 nil |
+| `wayrun.env(name)` | 插件在 `env` 中声明的变量；未设置则为 nil；未声明的名字抛出 |
 | `wayrun.which(name)` | 启动器 `$PATH` 上某个可执行文件的路径，否则 nil；与 `run` 行的命令将看到的 PATH 相同 |
 | `wayrun.script_dir()` | 脚本自身所在目录，用于携带图标等文件 |
 | `wayrun.plugin_dir(id)` | 插件可读目录：`~/.config/wayrun/plugins/<id>` |
@@ -78,7 +84,7 @@ return {
 的那一个（只收相对路径，限定在 `~/.config/wayrun/plugins/<id>/` 之内），而
 `fs.list` 与 `fs.stat` 可对任意路径取名字与元数据，`sqlite.snapshot` 可把任意
 SQLite 文件拷为副本整体查询（`firefox.lua` 就是这样读 `places.sqlite` 的），
-`wayrun.env` 可读启动器的环境变量，`http` 可访问网络。沙箱约束的是脚本能做
+`wayrun.env` 只能读调用中的插件自己声明的那些名字，`http` 可访问网络。沙箱约束的是脚本能做
 什么，而不是能读什么。调用中抛错则本次返回空行并记录到 journal，因此 `wayrun.log`
 与对风险操作的 `pcall` 就是调试手段。
 

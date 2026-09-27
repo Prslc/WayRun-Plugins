@@ -17,6 +17,7 @@ return {
     name = "My Plugin",
     icon = wayrun.icon("builtin:globe"), -- an absolute path, or nil
     description = "Short description",
+    env = { "MY_TOKEN" },                -- the env names it may read
     search = function(text)              -- rows for a routed query, in order
       return {
         { title = "You searched: " .. text,
@@ -34,6 +35,13 @@ Rows are the result items of the wire protocol: `title`, `summary`, `on_click`
 table in the wire shape is enough, for example
 `on_click = { type = "open", uri = "https://example.com" }`.
 
+The plugin table doubles as the plugin's manifest: `env` lists the exact
+environment variable names it may read, without patterns. A name outside the
+list raises (like an out-of-scope `fs.read`), a declared-but-unset one is nil
+(like a missing file), and the read belongs to a plugin call rather than to the
+script's own load — `wayrun.home()` and `wayrun.cache_dir()` cover the paths a
+script would otherwise take from the environment.
+
 ## The `wayrun` table
 
 | Call | Does |
@@ -46,7 +54,7 @@ table in the wire shape is enough, for example
 | `wayrun.log(message)` | writes to the launcher's journal under the script's name |
 | `wayrun.web_search_engine()` | the configured search engine, e.g. `"google"` |
 | `wayrun.time()` | Unix seconds, for signatures and cache TTLs |
-| `wayrun.env(name)` | the launcher process's variable `name`, or nil |
+| `wayrun.env(name)` | a variable the plugin declares in `env`, or nil when unset; an undeclared name raises |
 | `wayrun.which(name)` | an executable's path on the launcher's `$PATH`, or nil; the same PATH a `run` row's command will see |
 | `wayrun.script_dir()` | the script's own directory, for an icon it ships |
 | `wayrun.plugin_dir(id)` | the directory a plugin may read from, `~/.config/wayrun/plugins/<id>` |
@@ -83,8 +91,9 @@ database lives in the plugin's own directory. Reading is wider: `fs.read` is
 the scoped one (relative names only, confined to
 `~/.config/wayrun/plugins/<id>/`), while `fs.list` and `fs.stat` take any path
 for names and metadata, `sqlite.snapshot` copies any SQLite file for querying
-(`firefox.lua` reads `places.sqlite` this way), `wayrun.env` reads the
-launcher's environment, and `http` reaches the network. The sandbox bounds
+(`firefox.lua` reads `places.sqlite` this way), `wayrun.env` reads only the
+names the calling plugin declares, and `http` reaches the network. The sandbox
+bounds
 what a script can do, not what it can read. A call that raises yields no rows
 and reports to the journal, so `wayrun.log` and a `pcall` around risky work are
 the debugging tools.

@@ -19,6 +19,7 @@ return {
     name = "My Plugin",
     icon = wayrun.icon("builtin:globe"), -- an absolute path, or nil
     description = "Does something useful",
+    -- env = { "MY_TOKEN" },             -- the exact env names it may read
 
     search = function(text)
       if text == "" then
