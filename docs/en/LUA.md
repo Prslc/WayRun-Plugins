@@ -55,7 +55,6 @@ directory are always inside.
 | `wayrun.cache_dir()` | the launcher's cache directory, or nil |
 | `wayrun.icon(spec)` | resolves `builtin:…`, a theme name or `papirus:…` to an absolute path; nil on a miss |
 | `wayrun.urlencode(text)` | percent-encodes for use in a URL |
-| `wayrun.t(key, args)` | a UI string from the launcher's own tables, with `%{name}` filled from `args` |
 | `wayrun.log(message)` | writes to the launcher's journal under the script's name |
 | `wayrun.web_search_engine()` | the configured search engine, e.g. `"google"` |
 | `wayrun.time()` | Unix seconds, for signatures and cache TTLs |

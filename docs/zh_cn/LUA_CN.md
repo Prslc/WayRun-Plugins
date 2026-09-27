@@ -51,7 +51,6 @@ symlink，区域内的符号链接无法把路径带出区域；`fs.list`、`fs.
 | `wayrun.cache_dir()` | 启动器的缓存目录，否则 nil |
 | `wayrun.icon(spec)` | 把 `builtin:…`、主题图标名或 `papirus:…` 解析为绝对路径；未命中为 nil |
 | `wayrun.urlencode(text)` | 按 URL 需要做百分号编码 |
-| `wayrun.t(key, args)` | 取启动器自带文案表中的一条，`%{name}` 由 `args` 填充 |
 | `wayrun.log(message)` | 以脚本名义写入启动器的 journal |
 | `wayrun.web_search_engine()` | 配置的搜索引擎，如 `"google"` |
 | `wayrun.time()` | Unix 秒，用于签名与缓存 TTL |

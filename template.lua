@@ -10,7 +10,7 @@
 --     command = "/absolute/path/to/my-plugin.lua"
 --     resident = true    # keep one host process warm between calls
 --
--- The full surface (wayrun.sqlite, wayrun.http, wayrun.fs, wayrun.t, ...) is
+-- The full surface (wayrun.sqlite, wayrun.http, wayrun.fs, ...) is
 -- documented in this workspace's docs/en/LUA.md.
 
 return {
