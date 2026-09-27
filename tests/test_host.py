@@ -298,6 +298,29 @@ class ServerTest(unittest.TestCase):
         )
         self.assertEqual(row["badge"], "/opt/plugin/pin.svg")
 
+    def test_dict_rows_carry_actions_and_badge(self) -> None:
+        p = Plugin()
+
+        @p.search(id="dicts")
+        def search(text: str) -> list[dict[str, Any]]:
+            return [
+                {
+                    "title": text,
+                    "ephemeral": True,
+                    "actions": [panel("Copy", copy_text("x"))],
+                    "badge": "/opt/plugin/pin.svg",
+                }
+            ]
+
+        resp = Server(p).handle(
+            '{"jsonrpc":"2.0","method":"search","params":{"text":"x"},"id":16}'
+        )
+        assert resp is not None
+        row = resp["result"][0]
+        self.assertEqual(row["actions"], [panel("Copy", copy_text("x"))])
+        self.assertEqual(row["badge"], "/opt/plugin/pin.svg")
+        self.assertTrue(row["ephemeral"])
+
 
 class HelperTest(unittest.TestCase):
     """Contract tests for the hint / split_command helpers."""
