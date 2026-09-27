@@ -12,6 +12,7 @@ from wayrun_plugin import (
     hint,
     launch,
     open_uri,
+    panel,
     reveal,
     run,
     split_command,
@@ -247,6 +248,55 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(
             terminal("file:///tmp/a"), {"type": "terminal", "uri": "file:///tmp/a"}
         )
+
+    def test_panel_actions_and_badge_reach_the_wire(self) -> None:
+        p = Plugin()
+
+        @p.search(id="panel")
+        def search(text: str) -> list[Item]:
+            return [
+                Item(
+                    title=text,
+                    actions=[
+                        panel(
+                            "Copy URL",
+                            copy_text("https://example.com"),
+                            id="copy_url",
+                        )
+                    ],
+                    badge="/opt/plugin/pin.svg",
+                )
+            ]
+
+        self.assertEqual(
+            panel("Copy", copy_text("x")),
+            {
+                "title": "Copy",
+                "action": {
+                    "type": "execute",
+                    "command": {"type": "copy", "text": "x"},
+                },
+            },
+        )
+        resp = Server(p).handle(
+            '{"jsonrpc":"2.0","method":"search","params":{"text":"x"},"id":15}'
+        )
+        assert resp is not None
+        row = resp["result"][0]
+        self.assertEqual(
+            row["actions"],
+            [
+                {
+                    "title": "Copy URL",
+                    "action": {
+                        "type": "execute",
+                        "command": {"type": "copy", "text": "https://example.com"},
+                    },
+                    "id": "copy_url",
+                }
+            ],
+        )
+        self.assertEqual(row["badge"], "/opt/plugin/pin.svg")
 
 
 class HelperTest(unittest.TestCase):

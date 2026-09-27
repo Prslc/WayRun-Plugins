@@ -43,6 +43,39 @@ symlink，区域内的符号链接无法把路径带出区域；`fs.list`、`fs.
 `sqlite.snapshot` 遇到区域之外的路径直接报错，而插件自己的目录与脚本所在目录始终
 算在区域内。
 
+## 动作（Action）
+
+`on_click` 与行上 `actions` 里的每一项都是命令：带 `type` 标签的普通表。形状如下
+（即 wire 协议的 `Action`；字段码等细节见 WayRun 仓库的 `docs/en/jsonrpc.md`）：
+
+| `type` | 字段 | 效果 |
+| --- | --- | --- |
+| `run` | `cmd` | 执行一整行 shell 命令 |
+| `run_in_terminal` | `cmd` | 在终端模拟器里执行它 |
+| `launch` | `desktop_id` | 按 desktop id 启动应用 |
+| `copy` | `text` | 把文本写入 Wayland 剪贴板 |
+| `desktop_action` | `desktop_id`, `action_id` | 运行一个 `[Desktop Action …]` 组 |
+| `open` | `uri` | 用默认处理器打开 URL、`file:` 或 `mailto:` |
+| `reveal` | `uri` | 在文件管理器里显示文件（仅面板） |
+| `terminal` | `uri` | 在 URI 所在目录打开终端（仅面板） |
+
+行的 `actions` 组成 `Shift+Enter` 动作面板。每一项是一个带标题的命令；启动器会围绕
+你的条目补上它自己的条目（行自身的命令在有别的内容可提供时作为 "Open" 领衔，
+pin/unpin 或历史移除收尾）：
+
+```lua
+actions = {
+  {
+    title = "Copy URL",
+    id = "copy_url",                    -- 有了它，用户可把该项设为该行的默认动作
+    action = { type = "execute", command = { type = "copy", text = uri } },
+    icon = wayrun.icon("builtin:copy"), -- 绝对路径，与所有图标一样
+  },
+},
+```
+
+没有 `on_click` 的行是纯展示行；它照样可以带 `actions`。
+
 ## `wayrun` 表
 
 | 调用 | 作用 |

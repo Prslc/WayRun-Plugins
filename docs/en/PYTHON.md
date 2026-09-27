@@ -108,9 +108,9 @@ A plugin with no default view still shows its identity card (`name` +
 ### `Item`
 
 One result row. The four protocol keys (`title`, `summary`, `on_click`,
-`icon`) are always emitted (unset ones as `null`); `ephemeral` is added only
-when set. An unset `icon` falls back to the plugin icon, so most rows need no
-per-row icon.
+`icon`) are always emitted (unset ones as `null`); `ephemeral`, `actions` and
+`badge` are added only when set. An unset `icon` falls back to the plugin icon,
+so most rows need no per-row icon.
 
 ```python
 Item(
@@ -124,6 +124,19 @@ Item(
 `ephemeral=True` asks the core not to record the row in usage history. Use it
 for one-shot hits whose target is not worth re-opening later (the GitHub
 example in `example/python/github/` marks its repository results this way).
+
+`actions` attaches entries to the row's `Shift+Enter` panel — build them with
+`panel()`:
+
+```python
+Item(title="Firefox", actions=[panel("Copy URL", copy_text(url), id="copy_url")])
+```
+
+The launcher adds its own entries around yours (the row's own command as
+"Open", then pin/unpin/history). An entry's `icon` must be an absolute path,
+like every icon; `id` is the stable name a remembered default refers to.
+`badge` is an optional status glyph drawn at the row's edge, also an absolute
+image path.
 
 ### Icons
 

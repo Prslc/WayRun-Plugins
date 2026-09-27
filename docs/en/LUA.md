@@ -47,6 +47,41 @@ lead out of it; `fs.list`, `fs.stat` and `sqlite.snapshot` raise for anything
 outside those areas, while the plugin's own directory and the script's
 directory are always inside.
 
+## Actions
+
+`on_click` and every entry of a row's `actions` are commands: plain tables
+tagged by `type`. These are the shapes (the wire protocol's `Action`; the
+WayRun `docs/en/jsonrpc.md` has the detailed rules):
+
+| `type` | Fields | Effect |
+| --- | --- | --- |
+| `run` | `cmd` | run one shell line |
+| `run_in_terminal` | `cmd` | run it inside a terminal emulator |
+| `launch` | `desktop_id` | launch an app by desktop id |
+| `copy` | `text` | write `text` to the Wayland clipboard |
+| `desktop_action` | `desktop_id`, `action_id` | run one `[Desktop Action …]` group |
+| `open` | `uri` | open a URL, `file:` or `mailto:` URI with the default handler |
+| `reveal` | `uri` | show a file in the file manager (panel-only) |
+| `terminal` | `uri` | open a terminal in the URI's directory (panel-only) |
+
+A row's `actions` fill the `Shift+Enter` panel. Each entry is a titled command;
+the launcher adds its own entries around yours (the row's own command as
+"Open" when there is anything else to offer, and pin/unpin or history removal
+at the end):
+
+```lua
+actions = {
+  {
+    title = "Copy URL",
+    id = "copy_url",                    -- lets the user make it the row's default
+    action = { type = "execute", command = { type = "copy", text = uri } },
+    icon = wayrun.icon("builtin:copy"), -- an absolute path, like every icon
+  },
+},
+```
+
+A row with no `on_click` is display-only; it can still carry `actions`.
+
 ## The `wayrun` table
 
 | Call | Does |
