@@ -91,7 +91,7 @@ actions = {
 | `wayrun.fs.read(name)` | 读取上述目录中的文件；相对名，缺失返回 nil，越界报错 |
 | `wayrun.toml.decode(text)` | TOML 进，表出 |
 | `wayrun.json.decode(text)` / `wayrun.json.encode(value)` | JSON 进出 |
-| `wayrun.fs.list(dir)` | 声明区域内 `dir` 下的条目名，否则 nil |
+| `wayrun.fs.list(dir)` | 声明区域内 `dir` 下按名称排序的条目名，否则 nil |
 | `wayrun.fs.stat(path)` | 声明区域内路径的 `{ mtime_ns, size }`，否则 nil |
 | `wayrun.http.get(url, params?, options?)` | 阻塞式 GET，返回 `{status, headers, body}`；传输错误抛出；`params` 追加查询参数，其保留键 `headers` 为请求头表；`options` 是带 `timeout_ms`、`headers`、`ttl` 的表，或直接给一个毫秒数作超时 |
 | `wayrun.http.post(url, params?, options?)` | 同上，发送一个 body：`json = value`、`form = {…}` 或 `body = "…"` 三选一；永不缓存 |

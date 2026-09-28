@@ -97,7 +97,7 @@ A row with no `on_click` is display-only; it can still carry `actions`.
 | `wayrun.fs.read(name)` | a file under those directories; a relative name, nil when absent, an error when the name escapes |
 | `wayrun.toml.decode(text)` | TOML in, a table out |
 | `wayrun.json.decode(text)` / `wayrun.json.encode(value)` | JSON in and out |
-| `wayrun.fs.list(dir)` | entry names under `dir` inside a declared area, or nil |
+| `wayrun.fs.list(dir)` | sorted entry names under `dir` inside a declared area, or nil |
 | `wayrun.fs.stat(path)` | `{ mtime_ns, size }` for a path inside a declared area, or nil |
 | `wayrun.http.get(url, params?, options?)` | blocking GET answering `{status, headers, body}`; a transport error raises; `params` adds query values and takes a reserved `headers` table; `options` is a table with `timeout_ms`, `headers` and `ttl`, or a bare timeout in ms |
 | `wayrun.http.post(url, params?, options?)` | the same, sending one body: `json = value`, `form = {…}` or `body = "…"`; never cached |
