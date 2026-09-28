@@ -64,9 +64,8 @@ WayRun `docs/en/jsonrpc.md` has the detailed rules):
 | `terminal` | `uri` | open a terminal in the URI's directory (panel-only) |
 
 A row's `actions` fill the `Shift+Enter` panel. Each entry is a titled command;
-the launcher adds its own entries around yours (the row's own command as
-"Open" when there is anything else to offer, and pin/unpin or history removal
-at the end):
+the launcher adds one entry of its own around yours, the row's own command as
+"Open" when there is anything else to offer:
 
 ```lua
 actions = {
