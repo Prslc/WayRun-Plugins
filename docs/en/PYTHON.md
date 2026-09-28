@@ -133,22 +133,22 @@ Item(title="Firefox", actions=[panel("Copy URL", copy_text(url), id="copy_url")]
 ```
 
 The launcher adds its own entries around yours (the row's own command as
-"Open", then pin/unpin/history). An entry's `icon` must be an absolute path,
-like every icon; `id` is the stable name a remembered default refers to.
-`badge` is an optional status glyph drawn at the row's edge, also an absolute
-image path.
+"Open", then pin/unpin/history). An entry's `icon` is an icon spec — an
+absolute path or a `builtin:` glyph — like every icon; `id` is the stable name
+a remembered default refers to. `badge` is an optional status glyph drawn at
+the row's edge, the same spec.
 
 ### Icons
 
-An external host owns its icons: the WayRun core resolves no theme icon name, no
-`papirus:` spec and no `builtin:` glyph for a plugin. Ship the icon file inside
-the plugin directory and pass its **absolute path** — that is what the core
-renders (`file://` + path). `Path(__file__).resolve().with_name(...)` is the
-portable way to build it.
+An external host owns its icons: the WayRun core resolves no theme icon name and
+no `papirus:` spec for a plugin. Ship the icon file inside the plugin directory
+and pass its **absolute path** — that is what the core renders (`file://` +
+path) — or name a compiled `builtin:` glyph; a file you ship is the portable
+choice. `Path(__file__).resolve().with_name(...)` is the way to build it.
 
 `icon` is the plugin identity (the `?` list and the keyword hint) and the
-per-row fallback; a row's own `icon` overrides it. A missing or non-absolute
-icon falls back to the core's built-in placeholder.
+per-row fallback; a row's own `icon` overrides it. A missing or unusable icon
+falls back to the core's built-in placeholder.
 
 ### Command builders
 

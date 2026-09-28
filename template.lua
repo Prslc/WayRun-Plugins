@@ -17,7 +17,7 @@ return {
   {
     id = "my-plugin",                    -- must match the plugins.toml id
     name = "My Plugin",
-    icon = wayrun.icon("builtin:globe"), -- an absolute path, or nil
+    icon = wayrun.icon("builtin:globe"), -- an absolute path or `builtin:` glyph, or nil
     description = "Does something useful",
     -- env = { "MY_TOKEN" },             -- the exact env names it may read
     -- read = { "~/Documents" },         -- the areas it may look inside

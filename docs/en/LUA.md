@@ -15,7 +15,7 @@ return {
   {
     id = "my-plugin",                    -- must match the plugins.toml id
     name = "My Plugin",
-    icon = wayrun.icon("builtin:globe"), -- an absolute path, or nil
+    icon = wayrun.icon("builtin:globe"), -- an absolute path or `builtin:` glyph, or nil
     description = "Short description",
     env = { "MY_TOKEN" },                -- the env names it may read
     search = function(text)              -- rows for a routed query, in order
@@ -75,7 +75,7 @@ actions = {
     title = "Copy URL",
     id = "copy_url",                    -- lets the user make it the row's default
     action = { type = "execute", command = { type = "copy", text = uri } },
-    icon = wayrun.icon("builtin:copy"), -- an absolute path, like every icon
+    icon = wayrun.icon("builtin:copy"), -- an absolute path or `builtin:` glyph, like every icon
   },
 },
 ```
@@ -88,7 +88,7 @@ A row with no `on_click` is display-only; it can still carry `actions`.
 | --- | --- |
 | `wayrun.home()` | `$HOME`, or nil |
 | `wayrun.cache_dir()` | the launcher's cache directory, or nil |
-| `wayrun.icon(spec)` | resolves `builtin:…`, a theme name or `papirus:…` to an absolute path; nil on a miss |
+| `wayrun.icon(spec)` | resolves `builtin:…`, a theme name or `papirus:…` to an absolute path or a `builtin:` glyph; nil on a miss |
 | `wayrun.urlencode(text)` | percent-encodes for use in a URL |
 | `wayrun.log(message)` | writes to the launcher's journal under the script's name |
 | `wayrun.web_search_engine()` | the configured search engine, e.g. `"google"` |
@@ -142,7 +142,8 @@ the debugging tools.
 - A Lua plugin needs a non-empty keyword: it answers its own routed queries.
   The default chain (keyword `""`) is reserved for the built-ins.
 - Rows keep the order the script returns; there is no relevance channel.
-- Icons must be absolute paths; `wayrun.icon` is how to get one.
+- Icons must be absolute paths or known `builtin:` glyphs; `wayrun.icon` is how
+  to get one.
 
 ## Registering
 

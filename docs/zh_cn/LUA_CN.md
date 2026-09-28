@@ -14,7 +14,7 @@ return {
   {
     id = "my-plugin",                    -- 必须与 plugins.toml 条目一致
     name = "My Plugin",
-    icon = wayrun.icon("builtin:globe"), -- 绝对路径，或 nil
+    icon = wayrun.icon("builtin:globe"), -- 绝对路径或 builtin: 字形，或 nil
     description = "简短描述",
     env = { "MY_TOKEN" },                -- 可读的环境变量名
     search = function(text)              -- 路由查询的候选行，按序返回
@@ -69,7 +69,7 @@ actions = {
     title = "Copy URL",
     id = "copy_url",                    -- 有了它，用户可把该项设为该行的默认动作
     action = { type = "execute", command = { type = "copy", text = uri } },
-    icon = wayrun.icon("builtin:copy"), -- 绝对路径，与所有图标一样
+    icon = wayrun.icon("builtin:copy"), -- 绝对路径或 builtin: 字形，与所有图标一样
   },
 },
 ```
@@ -82,7 +82,7 @@ actions = {
 | --- | --- |
 | `wayrun.home()` | `$HOME`，否则 nil |
 | `wayrun.cache_dir()` | 启动器的缓存目录，否则 nil |
-| `wayrun.icon(spec)` | 把 `builtin:…`、主题图标名或 `papirus:…` 解析为绝对路径；未命中为 nil |
+| `wayrun.icon(spec)` | 把 `builtin:…`、主题图标名或 `papirus:…` 解析为绝对路径或 `builtin:` 字形；未命中为 nil |
 | `wayrun.urlencode(text)` | 按 URL 需要做百分号编码 |
 | `wayrun.log(message)` | 以脚本名义写入启动器的 journal |
 | `wayrun.web_search_engine()` | 配置的搜索引擎，如 `"google"` |
@@ -130,7 +130,7 @@ actions = {
 - Lua 插件必须有非空 keyword：它只应答自己的路由查询。默认链（keyword 为
   `""`）保留给内置插件。
 - 行序即脚本返回的顺序；没有相关度通道。
-- 图标必须是绝对路径；用 `wayrun.icon` 获取。
+- 图标必须是绝对路径或已知的 `builtin:` 字形；用 `wayrun.icon` 获取。
 
 ## 注册
 
