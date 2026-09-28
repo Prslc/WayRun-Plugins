@@ -90,7 +90,7 @@ def panel(
 
     ``id`` is the stable name a remembered default refers to; without one the
     entry can be run, but not made the row's default. ``icon`` is an icon spec
-    — an absolute path or a known ``builtin:`` glyph.
+    — an absolute path to a file the plugin ships.
     """
     entry: ActionEntry = {"title": title, "action": command}
     if icon is not None:

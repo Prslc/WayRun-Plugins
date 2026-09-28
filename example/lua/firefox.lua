@@ -2,9 +2,10 @@
 -- Firefox bookmarks and history from places.sqlite, as one host with two
 -- plugins: both read the same newest-profile snapshot.
 
-local bookmarks_icon = wayrun.icon("builtin:bookmark")
-local history_icon = wayrun.icon("builtin:clock")
-local copy_icon = wayrun.icon("builtin:copy")
+local assets = wayrun.script_dir() .. "/assets/"
+local bookmarks_icon = assets .. "bookmark_icon.svg"
+local history_icon = assets .. "clock_icon.svg"
+local copy_icon = assets .. "copy_icon.svg"
 local copy_title = "Copy URL"
 
 local function copy_action(uri)

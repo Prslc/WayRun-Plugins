@@ -2,16 +2,18 @@
 -- Web search suggestions from a Firefox-style suggest endpoint, one header
 -- row plus one row per suggestion. The engine is this plugin's own choice.
 
+local assets = wayrun.script_dir() .. "/assets/"
+
 local ENGINES = {
   google = {
     name = "Google",
-    icon = "builtin:globe",
+    icon = assets .. "globe_icon.svg",
     search_url = "https://www.google.com/search?q=",
     suggest_url = "https://suggestqueries.google.com/complete/search?client=firefox",
   },
   duckduckgo = {
     name = "DuckDuckGo",
-    icon = "builtin:globe",
+    icon = assets .. "globe_icon.svg",
     search_url = "https://duckduckgo.com/?q=",
     suggest_url = "https://duckduckgo.com/ac/?type=list",
   },
@@ -20,8 +22,8 @@ local ENGINES = {
 -- Pick one of the tables above.
 local engine = ENGINES.google
 
-local icon = wayrun.icon(engine.icon)
-local copy_icon = wayrun.icon("builtin:copy")
+local icon = engine.icon
+local copy_icon = assets .. "copy_icon.svg"
 local summary = "Search on " .. engine.name
 
 local function result_url(query)
