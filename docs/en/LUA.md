@@ -25,19 +25,18 @@ return {
       }
     end,
     top = function() end,                -- optional: the empty-query view
-    forget = function(action) end,       -- optional: claim a row for removal
   },
 }
 ```
 
 Rows are the result items of the wire protocol: `title`, `summary`, `on_click`
-(an action), `icon`, `ephemeral`, `actions`, `badge`. No builder is needed — a
+(an action), `icon`, `actions`. No builder is needed — a
 table in the wire shape is enough, for example
 `on_click = { type = "open", uri = "https://example.com" }`.
 
 The plugin table doubles as the plugin's manifest: `env` lists the exact
 environment variable names it may read, no patterns. An undeclared name raises;
-a declared-but-unset one is nil. Reads work inside `search`/`top`/`forget` and
+a declared-but-unset one is nil. Reads work inside `search`/`top` and
 not while the script loads — for the paths a script would otherwise take from
 the environment, use `wayrun.home()` and `wayrun.cache_dir()`.
 
@@ -74,7 +73,7 @@ actions = {
   {
     title = "Copy URL",
     id = "copy_url",                    -- lets the user make it the row's default
-    action = { type = "execute", command = { type = "copy", text = uri } },
+    action = { type = "copy", text = uri },
     icon = wayrun.icon("builtin:copy"), -- an absolute path or `builtin:` glyph, like every icon
   },
 },

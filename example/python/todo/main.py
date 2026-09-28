@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 """Todo plugin: a complete task manager.
 
-Demonstrates @plugin.search, @plugin.default_view, a forget handler, and
-state changes that re-invoke this script through a `run` command (so state
-lives in a file and nothing depends on the core staying alive).
+Demonstrates @plugin.search, @plugin.default_view, a panel action, and state
+changes that re-invoke this script through a `run` command (so state lives in
+a file and nothing depends on the core staying alive).
 
 Data: ~/.config/wayrun/todo.json
 Usage: type "todo", then space for all todos; keep typing to filter or add;
-Enter toggles done; Backspace deletes the selected todo.
+Enter toggles done; Shift+Enter offers Delete.
 """
 
 import contextlib
@@ -20,7 +20,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
-from wayrun_plugin import Item, plugin, run
+from wayrun_plugin import Item, panel, plugin, run
 
 # Bundled icon (absolute path; the UI renders file://).
 ICON = str(Path(__file__).resolve().with_name("icon.svg"))
@@ -60,11 +60,23 @@ def broken_item() -> Item:
 
 
 def row(item: dict[str, Any]) -> Item:
-    """A todo row; Enter toggles its state."""
-    action = run(f"{THIS} toggle {item['id']}")
+    """A todo row; Enter toggles its state, the panel offers Delete."""
+    toggle = run(f"{THIS} toggle {item['id']}")
+    # no id: deleting a todo stays out of the remembered-default reach
+    delete = panel("Delete", run(f"{THIS} delete {item['id']}"))
     if item["done"]:
-        return Item(title=item["text"], summary="Done · Enter reopens", on_click=action)
-    return Item(title=item["text"], summary="Open · Enter marks done", on_click=action)
+        return Item(
+            title=item["text"],
+            summary="Done · Enter reopens",
+            on_click=toggle,
+            actions=[delete],
+        )
+    return Item(
+        title=item["text"],
+        summary="Open · Enter marks done",
+        on_click=toggle,
+        actions=[delete],
+    )
 
 
 @plugin.search(
@@ -95,23 +107,6 @@ def top() -> list[Item]:
         return [broken_item()]
     items = sorted(data["items"], key=lambda it: (it["done"], it["id"]))
     return [row(it) for it in items]
-
-
-@plugin.method("forget")
-def forget(params: object) -> None:
-    """Delete the todo whose on_click command this forgotten row carries."""
-    if not isinstance(params, dict):
-        return
-    on_click = params.get("on_click")
-    if not isinstance(on_click, dict) or on_click.get("type") != "run":
-        return
-    cmd = on_click.get("cmd")
-    if not isinstance(cmd, str):
-        return
-    parts = shlex.split(cmd)
-    if len(parts) == 3 and parts[0] == THIS_PATH and parts[1] == "toggle":
-        with contextlib.suppress(ValueError):
-            cli_delete(int(parts[2]))
 
 
 def cli_add(text: str) -> None:
@@ -155,6 +150,9 @@ def main() -> None:
     elif action == "toggle" and args:
         with contextlib.suppress(ValueError):
             cli_toggle(int(args[0]))
+    elif action == "delete" and args:
+        with contextlib.suppress(ValueError):
+            cli_delete(int(args[0]))
 
 
 if __name__ == "__main__":

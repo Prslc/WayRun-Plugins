@@ -249,7 +249,7 @@ class ServerTest(unittest.TestCase):
             terminal("file:///tmp/a"), {"type": "terminal", "uri": "file:///tmp/a"}
         )
 
-    def test_panel_actions_and_badge_reach_the_wire(self) -> None:
+    def test_panel_actions_reach_the_wire(self) -> None:
         p = Plugin()
 
         @p.search(id="panel")
@@ -264,7 +264,6 @@ class ServerTest(unittest.TestCase):
                             id="copy_url",
                         )
                     ],
-                    badge="/opt/plugin/pin.svg",
                 )
             ]
 
@@ -272,10 +271,7 @@ class ServerTest(unittest.TestCase):
             panel("Copy", copy_text("x")),
             {
                 "title": "Copy",
-                "action": {
-                    "type": "execute",
-                    "command": {"type": "copy", "text": "x"},
-                },
+                "action": {"type": "copy", "text": "x"},
             },
         )
         resp = Server(p).handle(
@@ -288,17 +284,13 @@ class ServerTest(unittest.TestCase):
             [
                 {
                     "title": "Copy URL",
-                    "action": {
-                        "type": "execute",
-                        "command": {"type": "copy", "text": "https://example.com"},
-                    },
+                    "action": {"type": "copy", "text": "https://example.com"},
                     "id": "copy_url",
                 }
             ],
         )
-        self.assertEqual(row["badge"], "/opt/plugin/pin.svg")
 
-    def test_dict_rows_carry_actions_and_badge(self) -> None:
+    def test_dict_rows_carry_actions(self) -> None:
         p = Plugin()
 
         @p.search(id="dicts")
@@ -306,9 +298,8 @@ class ServerTest(unittest.TestCase):
             return [
                 {
                     "title": text,
-                    "ephemeral": True,
+                    "ephemeral": True,  # a stale key is ignored
                     "actions": [panel("Copy", copy_text("x"))],
-                    "badge": "/opt/plugin/pin.svg",
                 }
             ]
 
@@ -318,8 +309,7 @@ class ServerTest(unittest.TestCase):
         assert resp is not None
         row = resp["result"][0]
         self.assertEqual(row["actions"], [panel("Copy", copy_text("x"))])
-        self.assertEqual(row["badge"], "/opt/plugin/pin.svg")
-        self.assertTrue(row["ephemeral"])
+        self.assertEqual(set(row), {"title", "summary", "on_click", "icon", "actions"})
 
 
 class HelperTest(unittest.TestCase):

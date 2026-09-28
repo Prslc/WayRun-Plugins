@@ -39,11 +39,10 @@ local function row(title, query)
     summary = summary,
     on_click = { type = "open", uri = uri },
     icon = icon,
-    ephemeral = true,
     actions = {
       {
         title = "Copy URL",
-        action = { type = "execute", command = { type = "copy", text = uri } },
+        action = { type = "copy", text = uri },
         icon = copy_icon,
         id = "copy_url",
       },

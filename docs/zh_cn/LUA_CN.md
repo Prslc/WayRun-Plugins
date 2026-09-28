@@ -24,18 +24,17 @@ return {
       }
     end,
     top = function() end,                -- 可选：空查询视图
-    forget = function(action) end,       -- 可选：认领一行以从历史移除
   },
 }
 ```
 
 行即通信协议中的结果项：`title`、`summary`、`on_click`（一个动作）、`icon`、
-`ephemeral`、`actions`、`badge`。不需要构造器——写成结果项形状的表即可，例如
+`actions`。不需要构造器——写成结果项形状的表即可，例如
 `on_click = { type = "open", uri = "https://example.com" }`。
 
 插件表同时就是它的 manifest：`env` 列出插件可读的环境变量名，必须逐个写全，不支持
 通配。读名单之外的名字会直接报错；声明了但进程里没设置的才返回 nil。env 只能在
-`search`/`top`/`forget` 这些插件调用里读，脚本加载（顶层代码）时读会报错——想在
+`search`/`top` 这些插件调用里读，脚本加载（顶层代码）时读会报错——想在
 脚本里拿 home 或缓存目录，用 `wayrun.home()` 与 `wayrun.cache_dir()`，不必读环境。
 
 `read` 列出插件可以读取的区域：绝对路径或 `~/…`，同样逐个写全。每次读取都会解析
@@ -68,7 +67,7 @@ actions = {
   {
     title = "Copy URL",
     id = "copy_url",                    -- 有了它，用户可把该项设为该行的默认动作
-    action = { type = "execute", command = { type = "copy", text = uri } },
+    action = { type = "copy", text = uri },
     icon = wayrun.icon("builtin:copy"), -- 绝对路径或 builtin: 字形，与所有图标一样
   },
 },

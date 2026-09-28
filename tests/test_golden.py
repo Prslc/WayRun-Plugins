@@ -49,17 +49,6 @@ ROWS: list[tuple[Item, str | None, dict[str, Any]]] = [
         },
     ),
     (
-        Item(title="ephemeral", ephemeral=True),
-        None,
-        {
-            "title": "ephemeral",
-            "summary": None,
-            "on_click": None,
-            "icon": None,
-            "ephemeral": True,
-        },
-    ),
-    (
         Item(title="fallback"),
         "/opt/identity.svg",
         {

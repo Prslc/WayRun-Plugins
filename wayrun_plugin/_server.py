@@ -113,9 +113,7 @@ class Server:
                     summary=item.get("summary"),
                     on_click=item.get("on_click"),
                     icon=item.get("icon"),
-                    ephemeral=bool(item.get("ephemeral")),
                     actions=item.get("actions"),
-                    badge=item.get("badge"),
                 )
             rows.append(item.as_dict(default_icon))
         return rows

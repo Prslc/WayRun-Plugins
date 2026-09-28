@@ -104,7 +104,7 @@ def top() -> list[Item]:
 ### `Item`
 
 一条搜索结果。四个协议键（`title`/`summary`/`on_click`/`icon`）总是全量输出
-（未设置者为 `null`）；`ephemeral`、`actions` 与 `badge` 仅在设置时输出。`icon` 为
+（未设置者为 `null`）；`actions` 仅在设置时输出。`icon` 为
 `None` 时自动回退到插件图标——多数插件无需逐条重复设置图标。
 
 ```python
@@ -116,19 +116,14 @@ Item(
 )
 ```
 
-`ephemeral=True` 要求后端不把该行记入使用历史，适合一次性的搜索命中（
-`example/python/github/` 示例就是这么标记仓库结果的）。
-
 `actions` 给该行的 `Shift+Enter` 面板挂条目——用 `panel()` 构造：
 
 ```python
 Item(title="Firefox", actions=[panel("Copy URL", copy_text(url), id="copy_url")])
 ```
 
-启动器会围绕你的条目补上它自己的（行自身的命令作为 "Open" 领衔，pin/unpin 与
-历史移除收尾）。条目的 `icon` 是图标规范（绝对路径或 `builtin:` 字形，与所有图标
-一样）；`id` 是"被记住的默认动作"所指的稳定名字。`badge` 是可选的状态字形，
-画在行边缘，同样是图标规范。
+启动器会让行自身的命令作为 "Open" 领衔面板。条目的 `icon` 是图标规范（绝对路径或
+`builtin:` 字形，与所有图标一样）；`id` 是"被记住的默认动作"所指的稳定名字。
 
 ### 图标
 

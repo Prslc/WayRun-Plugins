@@ -13,7 +13,7 @@ local function copy_action(uri)
   end
   return {
     title = copy_title,
-    action = { type = "execute", command = { type = "copy", text = uri } },
+    action = { type = "copy", text = uri },
     icon = copy_icon,
     id = "copy_url",
   }
@@ -90,7 +90,6 @@ local function rows(mode, text, icon)
       summary = record.url,
       on_click = { type = "open", uri = record.url },
       icon = icon,
-      ephemeral = false,
     }
     local copy = copy_action(record.url)
     if copy then

@@ -74,7 +74,6 @@ The JSON-RPC 2.0 contract with the WayRun core (full protocol in WayRun
 | `list_plugins` | `[{id, name, keyword, icon, description, enabled}]` |
 | `search` | array of rows; `text` must be a non-empty string, else `-32602`; `params.plugin`, when present, must equal the plugin id |
 | `top` | the default view request; rows, or `-32601` when unregistered |
-| `forget` | core relays a forgotten row's `on_click` command; `null`, or `-32601` when unregistered |
 | request without `id` | no response (notification) |
 | unparseable / non-object / `jsonrpc != "2.0"` / non-string method | `-32600` |
 | unknown method | `-32601` |

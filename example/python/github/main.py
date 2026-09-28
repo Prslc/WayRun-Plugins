@@ -59,8 +59,6 @@ def search(text: str) -> list[Item]:
             summary=repo.get("description"),
             on_click=open_uri(repo["html_url"]),
             icon=ICON,
-            # a repo hit is a one-shot search result, not a target to re-open
-            ephemeral=True,
         )
         for repo in data["items"]
     ]

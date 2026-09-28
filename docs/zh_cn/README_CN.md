@@ -71,7 +71,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 | `list_plugins` | `[{id, name, keyword, icon, description, enabled}]` |
 | `search` | 条目数组；`text` 非空字符串否则 `-32602`；`params.plugin` 若存在必须等于插件 id |
 | `top` | 打开时的默认视图请求；结果项数组，未注册 `-32601` |
-| `forget` | 后端把被移除行的 `on_click` 命令转发给对应主机；`null`，未注册 `-32601` |
 | 无 `id` 的请求 | 无响应（notification） |
 | JSON 无法解析 / 非对象 / `jsonrpc != "2.0"` / method 非字符串 | `-32600` |
 | 未知方法 | `-32601` |
