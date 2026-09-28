@@ -84,7 +84,6 @@ actions = {
 | `wayrun.icon(spec)` | 把 `builtin:…`、主题图标名或 `papirus:…` 解析为绝对路径或 `builtin:` 字形；未命中为 nil |
 | `wayrun.urlencode(text)` | 按 URL 需要做百分号编码 |
 | `wayrun.log(message)` | 以脚本名义写入启动器的 journal |
-| `wayrun.web_search_engine()` | 配置的搜索引擎，如 `"google"` |
 | `wayrun.time()` | Unix 秒，用于签名与缓存 TTL |
 | `wayrun.env(name)` | 插件在 `env` 中声明的变量；未设置则为 nil；未声明的名字抛出 |
 | `wayrun.which(name)` | 启动器 `$PATH` 上某个可执行文件的路径，否则 nil；与 `run` 行的命令将看到的 PATH 相同 |

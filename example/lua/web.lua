@@ -1,6 +1,6 @@
 #!/usr/bin/env -S wayrun --lua-host
--- Web search suggestions from the configured engine's Firefox-style suggest
--- endpoint, one header row plus one row per suggestion.
+-- Web search suggestions from a Firefox-style suggest endpoint, one header
+-- row plus one row per suggestion. The engine is this plugin's own choice.
 
 local ENGINES = {
   google = {
@@ -17,12 +17,8 @@ local ENGINES = {
   },
 }
 
-local configured = wayrun.web_search_engine()
-local engine = ENGINES[configured]
-if not engine then
-  wayrun.log("unknown search engine " .. configured .. "; using google")
-  engine = ENGINES.google
-end
+-- Pick one of the tables above.
+local engine = ENGINES.google
 
 local icon = wayrun.icon(engine.icon)
 local copy_icon = wayrun.icon("builtin:copy")

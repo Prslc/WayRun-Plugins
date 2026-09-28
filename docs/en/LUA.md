@@ -90,7 +90,6 @@ A row with no `on_click` is display-only; it can still carry `actions`.
 | `wayrun.icon(spec)` | resolves `builtin:…`, a theme name or `papirus:…` to an absolute path or a `builtin:` glyph; nil on a miss |
 | `wayrun.urlencode(text)` | percent-encodes for use in a URL |
 | `wayrun.log(message)` | writes to the launcher's journal under the script's name |
-| `wayrun.web_search_engine()` | the configured search engine, e.g. `"google"` |
 | `wayrun.time()` | Unix seconds, for signatures and cache TTLs |
 | `wayrun.env(name)` | a variable the plugin declares in `env`, or nil when unset; an undeclared name raises |
 | `wayrun.which(name)` | an executable's path on the launcher's `$PATH`, or nil; the same PATH a `run` row's command will see |
