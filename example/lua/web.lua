@@ -54,6 +54,7 @@ return {
     name = engine.name,
     icon = icon,
     description = "Search " .. engine.name .. " suggestions",
+    api = 1,
     search = function(text)
       if text == "" then
         return {}

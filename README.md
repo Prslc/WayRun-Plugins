@@ -22,8 +22,8 @@ wayrun-plugin/
 │   └── lua/
 │       ├── firefox.lua     # Firefox bookmarks and history (one host)
 │       └── web.lua         # search-engine suggestions
-├── docs/en/                # PYTHON.md, LUA.md
-├── docs/zh_cn/             # README_CN.md, PYTHON_CN.md, LUA_CN.md
+├── docs/en/                # PYTHON.md
+├── docs/zh_cn/             # README_CN.md, PYTHON_CN.md
 ├── tests/test_host.py      # framework protocol contract tests (unittest)
 ├── ruff.toml               # lint + format config
 ├── pyrightconfig.json      # LSP config
@@ -56,12 +56,13 @@ examples.
 
 A plugin can also be one Lua script — no framework, no Python install. The
 WayRun binary hosts it itself (`wayrun --lua-host`), answering the same
-JSON-RPC surface a Python host does, so it starts in milliseconds.
+JSON-RPC surface a Python host does, so it starts in milliseconds. Its guide —
+the script contract, the full `wayrun` table, the sandbox and registration —
+lives with the launcher that implements it:
+[Lua plugins](https://github.com/Prslc/WayRun/blob/main/docs/en/lua.md).
 
-[docs/en/LUA.md](docs/en/LUA.md) has the script contract, the full `wayrun`
-table, the sandbox and registration. `example/lua/firefox.lua` (a host with two
-plugins) and `example/lua/web.lua` are complete worked examples, reading
-`places.sqlite` and the web respectively.
+`example/lua/firefox.lua` (a host with two plugins) and `example/lua/web.lua`
+are complete worked examples, reading `places.sqlite` and the web respectively.
 
 ## Protocol
 
@@ -71,7 +72,7 @@ The JSON-RPC 2.0 contract with the WayRun core (full protocol in WayRun
 | Case | Response |
 |------|----------|
 | `ping` | `"pong"` |
-| `list_plugins` | `[{id, name, keyword, icon, description, enabled}]` |
+| `list_plugins` | `[{id, name, keyword, icon, description, enabled, api}]` |
 | `search` | array of rows; `text` must be a non-empty string, else `-32602`; `params.plugin`, when present, must equal the plugin id |
 | `top` | the default view request; rows, or `-32601` when unregistered |
 | request without `id` | no response (notification) |

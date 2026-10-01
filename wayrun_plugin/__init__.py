@@ -35,12 +35,12 @@ from ._item import (
     split_command,
     terminal,
 )
-from ._plugin import Plugin
+from ._plugin import PLUGIN_API, Plugin
 from ._server import Server, serve
 
 plugin = Plugin()
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 __all__ = [
     "plugin",
@@ -59,4 +59,5 @@ __all__ = [
     "Plugin",
     "Server",
     "serve",
+    "PLUGIN_API",
 ]

@@ -23,8 +23,8 @@ wayrun-plugin/
 │   └── lua/
 │       ├── firefox.lua     # Firefox 书签与历史（一个主机）
 │       └── web.lua         # 搜索引擎联想词
-├── docs/en/                # PYTHON.md、LUA.md
-├── docs/zh_cn/             # README_CN.md、PYTHON_CN.md、LUA_CN.md
+├── docs/en/                # PYTHON.md
+├── docs/zh_cn/             # README_CN.md、PYTHON_CN.md
 ├── tests/test_host.py      # 框架协议契约测试（unittest，无第三方依赖）
 ├── ruff.toml               # 代码风格配置
 ├── pyrightconfig.json      # LSP 配置
@@ -55,8 +55,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 插件也可以就是一个 Lua 脚本——无框架、无需安装 Python。WayRun 二进制自身承载
 它（`wayrun --lua-host`），与 Python 主机讲同一套 JSON-RPC 接口，启动只需毫秒级。
+它的指南——脚本契约、完整的 `wayrun` 表、沙箱与注册——随实现它的启动器一同维护：
+[Lua 插件](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/lua.md)。
 
-脚本契约、完整的 `wayrun` 表、沙箱与注册见 [LUA_CN.md](LUA_CN.md)。
 `example/lua/firefox.lua`（一个主机两个插件）与 `example/lua/web.lua` 是两个完整
 示例，分别读取 `places.sqlite` 与网页。
 
@@ -68,7 +69,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 | 情形 | 响应 |
 |------|------|
 | `ping` | `"pong"` |
-| `list_plugins` | `[{id, name, keyword, icon, description, enabled}]` |
+| `list_plugins` | `[{id, name, keyword, icon, description, enabled, api}]` |
 | `search` | 条目数组；`text` 非空字符串否则 `-32602`；`params.plugin` 若存在必须等于插件 id |
 | `top` | 打开时的默认视图请求；结果项数组，未注册 `-32601` |
 | 无 `id` 的请求 | 无响应（notification） |
