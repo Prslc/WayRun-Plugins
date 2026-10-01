@@ -71,6 +71,7 @@ handler on `def search(text: str)`.
 | `keyword` | no | trigger prefix (empty = a default provider) |
 | `icon` | no | absolute path to an icon file the plugin ships |
 | `description` | no | readiness hint text |
+| `api` | no | the plugin contract this was written against; defaults to the one the framework targets, and rarely needs stating |
 
 ### `@plugin.method(name)`
 

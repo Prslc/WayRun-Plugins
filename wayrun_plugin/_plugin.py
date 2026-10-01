@@ -7,6 +7,10 @@ from typing import Any, TypeVar
 
 F = TypeVar("F", bound=Callable[..., Any])
 
+# The plugin contract this framework targets. The core compares it against its
+# own and logs a mismatch rather than refusing the plugin.
+PLUGIN_API = 1
+
 
 class Plugin:
     """Decorator registry for one external plugin process."""
@@ -33,11 +37,14 @@ class Plugin:
         keyword: str = "",
         icon: str | None = None,
         description: str = "",
+        api: int = PLUGIN_API,
     ) -> Callable[[F], F]:
         """Register the search handler and the plugin identity.
 
         ``id`` must match the ``plugins.toml`` entry, or the core ignores the
         identity. ``keyword`` empty means the plugin is a default provider.
+        ``api`` is the plugin contract this was written against; it defaults to
+        the one the framework targets and rarely needs stating.
         """
 
         def deco(fn: F) -> F:
@@ -48,6 +55,7 @@ class Plugin:
                 "icon": icon,
                 "description": description,
                 "enabled": True,
+                "api": api,
             }
             self._handlers["search"] = fn
             return fn

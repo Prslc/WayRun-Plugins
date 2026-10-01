@@ -68,7 +68,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 | 情形 | 响应 |
 |------|------|
 | `ping` | `"pong"` |
-| `list_plugins` | `[{id, name, keyword, icon, description, enabled}]` |
+| `list_plugins` | `[{id, name, keyword, icon, description, enabled, api}]` |
 | `search` | 条目数组；`text` 非空字符串否则 `-32602`；`params.plugin` 若存在必须等于插件 id |
 | `top` | 打开时的默认视图请求；结果项数组，未注册 `-32601` |
 | 无 `id` 的请求 | 无响应（notification） |

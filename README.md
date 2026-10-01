@@ -71,7 +71,7 @@ The JSON-RPC 2.0 contract with the WayRun core (full protocol in WayRun
 | Case | Response |
 |------|----------|
 | `ping` | `"pong"` |
-| `list_plugins` | `[{id, name, keyword, icon, description, enabled}]` |
+| `list_plugins` | `[{id, name, keyword, icon, description, enabled, api}]` |
 | `search` | array of rows; `text` must be a non-empty string, else `-32602`; `params.plugin`, when present, must equal the plugin id |
 | `top` | the default view request; rows, or `-32601` when unregistered |
 | request without `id` | no response (notification) |

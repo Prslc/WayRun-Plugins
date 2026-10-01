@@ -19,6 +19,7 @@ return {
     name = "My Plugin",
     -- icon = wayrun.script_dir() .. "/icon.svg", -- an icon file you ship beside the script
     description = "Does something useful",
+    api = 1,                             -- the plugin contract it was written against
     -- env = { "MY_TOKEN" },             -- the exact env names it may read
     -- read = { "~/Documents" },         -- the areas it may look inside
 

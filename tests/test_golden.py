@@ -79,6 +79,16 @@ COMMANDS: list[tuple[Any, dict[str, Any]]] = [
 ]
 
 
+IDENTITY: dict[str, Any] = {
+    "id": "golden",
+    "name": "Golden",
+    "icon": "/opt/identity.svg",
+    # The core's `wire::PLUGIN_API`. `test_host.py` pins the same literal
+    # through the decorator, so a drift on either side fails there.
+    "api": 1,
+}
+
+
 class GoldenWireTest(unittest.TestCase):
     def test_every_row_feature_serializes_to_the_golden_json(self) -> None:
         for item, default_icon, expected in ROWS:
@@ -87,6 +97,12 @@ class GoldenWireTest(unittest.TestCase):
     def test_every_command_builder_serializes_to_the_golden_json(self) -> None:
         for built, expected in COMMANDS:
             self.assertEqual(built, expected)
+
+    def test_the_identity_matches_the_golden_json(self) -> None:
+        server = Server(_SearchPlugin())
+        response = server.handle('{"jsonrpc":"2.0","method":"list_plugins","id":1}')
+        assert response is not None
+        self.assertEqual(response["result"], [IDENTITY])
 
     def test_a_search_reply_carries_the_golden_rows(self) -> None:
         server = Server(_SearchPlugin())
@@ -111,7 +127,7 @@ class GoldenWireTest(unittest.TestCase):
 class _SearchPlugin:
     """The two golden rows as one plugin, without the decorator machinery."""
 
-    meta = {"id": "golden", "name": "Golden", "icon": "/opt/identity.svg"}
+    meta = IDENTITY
 
     @property
     def handlers(self) -> dict[str, Any]:
@@ -151,6 +167,7 @@ class TemplateServeLoopTest(unittest.TestCase):
         replies = [json.loads(line) for line in result.stdout.splitlines()]
         self.assertEqual(len(replies), 2, "one process served both requests")
         self.assertEqual(replies[0]["result"][0]["id"], "template")
+        self.assertEqual(replies[0]["result"][0]["api"], 1)
         row = replies[1]["result"][0]
         self.assertEqual(row["title"], "You searched: hi")
         self.assertEqual(row["on_click"], {"type": "copy", "text": "hi"})

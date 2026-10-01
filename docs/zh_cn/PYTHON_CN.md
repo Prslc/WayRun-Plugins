@@ -69,6 +69,7 @@ bootstrap 的 `parents[N]` 必须指向工作区根（含 `wayrun_plugin/` 的�
 | `keyword` | 否 | 触发前缀（空 = 默认触发） |
 | `icon` | 否 | 插件自带图标文件的绝对路径 |
 | `description` | 否 | 就绪提示文案 |
+| `api` | 否 | 编写时所针对的插件契约版本；默认即框架所针对的那一个，通常无需填写 |
 
 ### `@plugin.method(name)`
 

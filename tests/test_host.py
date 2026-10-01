@@ -81,6 +81,9 @@ class ServerTest(unittest.TestCase):
                     "icon": "/opt/plugin/icon.svg",
                     "description": "d",
                     "enabled": True,
+                    # Pinned against the core's `wire::PLUGIN_API`, not read from
+                    # this package: a drift has to fail here rather than follow.
+                    "api": 1,
                 }
             ],
         )
