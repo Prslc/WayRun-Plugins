@@ -13,7 +13,9 @@ cp -r template my-plugin
 chmod +x my-plugin/main.py
 ```
 
-在 `~/.config/wayrun/plugins.toml` 注册（`command` 是单个可执行令牌，用绝对路径）：
+在 `~/.config/wayrun/plugins.toml` 注册（`command` 是单个可执行令牌，用绝对路径；
+全部字段见启动器的
+[plugins.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/plugins.md#条目字段)）：
 
 ```toml
 [[plugins]]
@@ -81,9 +83,9 @@ dict）原样作为 `result` 序列化。
 ### `@plugin.default_view`
 
 注册插件的**默认视图**——后端以关键词 + 空格打开插件（空查询）时，会向主机
-发起 `top` 请求并展示返回的结果行（协议见
-[WayRun jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md)）。
-零参数处理函数，返回结果行，归一化与 `search` 相同：
+发起 `top` 请求。零参数处理函数，返回结果行，归一化与 `search` 相同；启动器
+拿到这些行之后怎么做，见
+[WayRun jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md#关键词插件的默认视图)：
 
 ```python
 from wayrun_plugin import Item, plugin, run
@@ -100,11 +102,14 @@ def top() -> list[Item]:
     ]
 ```
 
-未注册默认视图的插件，打开时后端仍显示身份卡片（`name` + `description`）。
+未注册默认视图的插件，打开时后端仍显示身份卡片（`name` + `description`），
+即上一节所述启动器自身的行为。
 
 ### `Item`
 
-一条搜索结果。四个协议键（`title`/`summary`/`on_click`/`icon`）总是全量输出
+一条搜索结果，形状由启动器的
+[jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md#结果项)
+定义。四个协议键（`title`/`summary`/`on_click`/`icon`）总是全量输出
 （未设置者为 `null`）；`actions` 仅在设置时输出。`icon` 为
 `None` 时自动回退到插件图标——多数插件无需逐条重复设置图标。
 
@@ -123,18 +128,20 @@ Item(
 Item(title="Firefox", actions=[panel("Copy URL", copy_text(url), id="copy_url")])
 ```
 
-启动器会让行自身的命令作为 "Open" 领衔面板。条目的 `icon` 是图标规范（插件自带文件的
-绝对路径，与所有图标一样）；`id` 是"被记住的默认动作"所指的稳定名字。
+条目的 `icon` 是图标规范（插件自带文件的
+绝对路径，与所有图标一样）；`id` 是"被记住的默认动作"所指的稳定名字。启动器
+在这些条目之外补了什么、默认动作如何生效，见
+[WayRun plugins.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/plugins.md#结果动作)。
 
 ### 图标
 
 图标由外部主机自备：`icon` 必须是绝对路径。把图标文件放进插件目录、传它的
-**绝对路径**——后端就按 `file://` + 路径渲染；`builtin:` 字形、主题图标名与
-`papirus:` 规范一律视为无图标。`Path(__file__).resolve().with_name(...)`
-是构造路径的方式。
+**绝对路径**；`Path(__file__).resolve().with_name(...)` 是构造路径的方式。
+什么样的值算数，是启动器的规则，见
+[WayRun jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md#图标规范)。
 
 `icon` 既是插件身份（`?` 列表与关键词提示），也是逐行回退值；行自身的 `icon`
-覆盖它。图标缺失或不可用时，回退到后端内置的占位图标。
+覆盖它。
 
 ### 命令构造器
 
@@ -152,8 +159,9 @@ Item(title="Firefox", actions=[panel("Copy URL", copy_text(url), id="copy_url")]
 | `reveal(uri)` | 在文件管理器中定位文件（仅面板可见） |
 | `terminal(uri)` | 在 URI 所在目录打开终端，文件则用其父目录（仅面板可见） |
 
-不设置 `on_click` 的行仅展示。它的格式就是 WayRun `docs/zh_cn/jsonrpc.md`
-里记录的 `Command` 对象。
+不设置 `on_click` 的行仅展示。它的格式就是启动器
+[jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md#动作)
+里记录的 `Action` 对象。
 
 ### `copy_text(text)`
 
@@ -179,11 +187,14 @@ return [hint("金额无效：'abc'", "例：cc 100 usd cny")]
 ### `plugin.run()`
 
 `main.py` 最后一行。阻塞读 stdin 直到 EOF：应答 `ping` / `list_plugins` /
-`search` / `top` 与所有注册方法。无 `id` 的请求是 notification，不产生响应。
+`search` / `top` 与所有注册方法。无 `id` 的请求是 notification，不产生响应，
+见
+[WayRun jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md)。
 
 循环服务到 EOF，因此同一个主机两种用法皆可：逐次 fork（一个请求后 stdin 关闭），
-或在 `plugins.toml` 中设 `resident = true` 后跨调用保温——每次调用约 0.1ms，
-而每次新起解释器要约 40ms。
+或在 `plugins.toml` 中设 `resident = true` 后跨调用保温。这让每次调用约 0.1ms，
+而每次新起解释器要约 40ms；该开关见
+[WayRun plugins.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/plugins.md#外部主机)。
 
 ### `Plugin`、`Server`、`serve`（进阶）
 
