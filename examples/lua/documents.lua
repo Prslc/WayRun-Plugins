@@ -5,12 +5,6 @@ local DIR = (wayrun.script_dir() or "") .. "/documents"
 local EXT = { txt = true, md = true }
 local MAX_PREVIEW = 4096
 
-local function file_uri(path)
-  return "file://" .. path:gsub("[^%w%-%._~/]", function(c)
-    return string.format("%%%02X", c:byte())
-  end)
-end
-
 local function excerpt(text)
   if #text <= MAX_PREVIEW then
     return text
@@ -58,10 +52,10 @@ local function recent(text)
       title = item.name,
       summary = item.path,
       preview = (body and body ~= "") and { type = "text", text = body } or nil,
-      on_click = { type = "open", uri = file_uri(item.path) },
+      on_click = { type = "open", uri = wayrun.file_uri(item.path) },
       actions = {
         { title = "Copy path", id = "copy_path", action = { type = "copy", text = item.path } },
-        { title = "Reveal", id = "reveal", action = { type = "reveal", uri = file_uri(item.path) } },
+        { title = "Reveal", id = "reveal", action = { type = "reveal", uri = wayrun.file_uri(item.path) } },
       },
     }
   end

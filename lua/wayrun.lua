@@ -1,5 +1,4 @@
 ---@meta
--- Vendored from WayRun's lua/wayrun.lua; refresh it when the SDK changes.
 
 ---@class WayrunStat
 ---@field mtime_ns integer
@@ -61,6 +60,10 @@ function wayrun.icon(spec) end
 ---@param text string
 ---@return string
 function wayrun.urlencode(text) end
+
+---@param path string
+---@return string?
+function wayrun.file_uri(path) end
 
 ---@param message string
 function wayrun.log(message) end
