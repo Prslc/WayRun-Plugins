@@ -23,7 +23,10 @@ wayrun-plugin/
 │   │   └── todo/           # full example: todo manager
 │   └── lua/
 │       ├── firefox.lua     # Firefox bookmarks and history (one host)
-│       └── web.lua         # search-engine suggestions
+│       ├── web.lua         # search-engine suggestions
+│       ├── screenshots.lua # recent screenshots with image previews
+│       └── documents.lua   # notes with text previews
+│           documents/      # sample notes the plugin ships
 ├── docs/en/                # PYTHON.md
 ├── docs/zh_cn/             # README_CN.md, PYTHON_CN.md
 ├── tests/test_host.py      # framework protocol contract tests (unittest)
@@ -66,6 +69,9 @@ lives with the launcher that implements it:
 
 `example/lua/firefox.lua` (a host with two plugins) and `example/lua/web.lua`
 are complete worked examples, reading `places.sqlite` and the web respectively.
+`example/lua/screenshots.lua` and `example/lua/documents.lua` show the split
+preview column: recent images in `~/Pictures/Screenshots` and plain-text notes
+shipped beside the script, each with open/copy/reveal actions.
 
 The repo vendors the LuaLS stub at `lua/wayrun.lua`; `.luarc.json` points
 `Lua.workspace.library` at it, so `wayrun.` completes in `template.lua` and the
