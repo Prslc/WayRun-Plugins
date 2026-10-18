@@ -2,7 +2,7 @@
 
 External plugin workspace for [WayRun](https://github.com/Prslc/WayRun): Python
 plugins through the shared decorator framework `wayrun_plugin`, Lua plugins as
-one script file hosted by the WayRun binary.
+one entry script (optionally split into modules) hosted by the WayRun binary.
 
 ## Layout
 
@@ -14,6 +14,8 @@ wayrun-plugin/
 │   ├── _plugin.py          # Plugin (the decorators)
 │   └── _server.py          # Server / serve (the JSON-RPC loop)
 ├── template/               # cp -r template <new-plugin>; ships icon.svg
+├── lua/wayrun.lua          # LuaLS stub for the wayrun SDK
+├── .luarc.json             # points LuaLS's workspace library at lua/
 ├── template.lua            # Lua plugin skeleton (one file)
 ├── example/                # worked examples
 │   ├── python/
@@ -54,8 +56,9 @@ examples.
 
 ## Lua plugins
 
-A plugin can also be one Lua script — no framework, no Python install. The
-WayRun binary hosts it itself (`wayrun --lua-host`), answering the same
+A plugin can also be Lua — one entry script, optionally split into modules with
+`wayrun.import` — no framework, no Python install. The WayRun binary hosts it
+itself (`wayrun --lua-host`), answering the same
 JSON-RPC surface a Python host does, so it starts in milliseconds. Its guide —
 the script contract, the full `wayrun` table, the sandbox and registration —
 lives with the launcher that implements it:
@@ -63,6 +66,15 @@ lives with the launcher that implements it:
 
 `example/lua/firefox.lua` (a host with two plugins) and `example/lua/web.lua`
 are complete worked examples, reading `places.sqlite` and the web respectively.
+
+The repo vendors the LuaLS stub at `lua/wayrun.lua`; `.luarc.json` points
+`Lua.workspace.library` at it, so `wayrun.` completes in `template.lua` and the
+examples. The stub is copied from WayRun's `lua/wayrun.lua`; refresh it when the
+SDK changes.
+
+Scripts can split into modules with `wayrun.import("lib/util")`, write under
+their own directory with `wayrun.fs.write`, and debug with `print` or
+`wayrun.log` — both go to the journal, never stdout.
 
 ## Protocol
 

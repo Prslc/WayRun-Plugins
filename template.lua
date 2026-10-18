@@ -6,9 +6,12 @@
 --
 --     [[plugins]]
 --     id = "my-plugin"
---     keyword = "mp"
+--     keyword = "mp"    # or "" to join the default chain (listed fallback)
 --     command = "/absolute/path/to/my-plugin.lua"
 --     resident = true    # keep one host process warm between calls
+--
+-- Debug with print() or wayrun.log(): both write to the journal, never stdout.
+-- Split a larger plugin with wayrun.import("lib/util") (same sandbox, cached).
 --
 -- The full surface (wayrun.sqlite, wayrun.http, wayrun.fs, ...) is documented
 -- at https://github.com/Prslc/WayRun/blob/main/docs/en/lua.md.
