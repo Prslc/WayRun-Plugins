@@ -3,7 +3,3 @@ target-version = "py310"
 
 [lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "W"]
-
-[lint.per-file-ignores]
-# The sys.path bootstrap must run before the wayrun_plugin import.
-"**/main.py" = ["E402"]

@@ -5,6 +5,7 @@ Create a new plugin by copying this directory and editing this file:
 
     cp -r template my-plugin
 
+The directory carries its own `wayrun_plugin/`, so the copy runs anywhere.
 Then register it in ~/.config/wayrun/plugins.toml (command must be a
 single executable token; chmod +x main.py and use an absolute path):
 
@@ -14,10 +15,7 @@ single executable token; chmod +x main.py and use an absolute path):
     command = "/absolute/path/to/my-plugin/main.py"
 """
 
-import sys
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import Item, copy_text, hint, plugin
 

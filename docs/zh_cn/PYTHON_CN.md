@@ -28,10 +28,7 @@ command = "/absolute/path/my-plugin/main.py"
 
 ```python
 #!/usr/bin/env python3
-import sys
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import plugin, Item, copy_text
 
@@ -53,9 +50,9 @@ def search(text: str) -> list[Item]:
 plugin.run()
 ```
 
-bootstrap 的 `parents[N]` 必须指向工作区根（含 `wayrun_plugin/` 的目录）：插件目录
-直接在根下时用 `parents[1]`（即 `cp -r template` 得到的布局），
-`examples/python/<插件>/` 下的示例嵌套三层，用 `parents[3]`。
+插件目录自带 `wayrun_plugin/`，与 `main.py` 并列，所以脚本无需任何 path 设置；
+`cp -r template` 得到的就是这个布局。改动框架后用 `scripts/vendor.sh <插件目录>`
+刷新副本。
 
 ## API 参考
 

@@ -28,10 +28,7 @@ Minimal plugin:
 
 ```python
 #!/usr/bin/env python3
-import sys
 from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from wayrun_plugin import plugin, Item, copy_text
 
@@ -53,10 +50,9 @@ def search(text: str) -> list[Item]:
 plugin.run()
 ```
 
-The bootstrap's `parents[N]` must reach the workspace root (the directory
-holding `wayrun_plugin/`): `parents[1]` for a plugin directly under the root —
-what `cp -r template` gives — and `parents[3]` for the shipped examples nested
-at `examples/python/<plugin>/`.
+The plugin directory carries `wayrun_plugin/` beside `main.py`, so the script
+finds it with no path setup: `cp -r template` gives that layout. Refresh the
+copy with `scripts/vendor.sh my-plugin` after changing the framework.
 
 ## API
 

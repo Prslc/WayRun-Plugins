@@ -3,14 +3,11 @@
 
 import json
 import os
-import sys
 from pathlib import Path
 from typing import Any
 from urllib.error import HTTPError
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[3]))
 
 from wayrun_plugin import Item, open_uri, plugin
 

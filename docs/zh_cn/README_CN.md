@@ -18,6 +18,7 @@ wayrun-plugin/
 │   ├── _plugin.py          # Plugin（装饰器）
 │   └── _server.py          # Server / serve（JSON-RPC 循环）
 ├── template/               # cp -r template <新插件目录>；自带 icon.svg
+├── scripts/vendor.sh       # 刷新插件目录里的 wayrun_plugin/ 副本
 ├── lua/wayrun.lua          # LuaLS 的 wayrun SDK 存根
 ├── .luarc.json             # 让 LuaLS 的 workspace library 指向 lua/
 ├── template.lua            # Lua 插件骨架（单文件）
@@ -39,19 +40,9 @@ wayrun-plugin/
 └── NOTICE                  # 内置图标署名（Material Symbols）
 ```
 
-插件目录之间互不依赖，只共享根目录的 `wayrun_plugin` 包。每个插件的
-`main.py` 通过 3 行 bootstrap 把工作区根加入 `sys.path`：
-
-```python
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-```
-
-即 bootstrap 必须指向工作区根：插件目录是工作区根的**直接子目录**时用
-`parents[1]`（`template/` 采用的布局）；`examples/python/<插件>/` 下的示例嵌套
-三层，用 `parents[3]`。
+插件目录自带 `wayrun_plugin/`，与 `main.py` 并列，所以放到哪里都能运行：Python
+本就把脚本目录放进 `sys.path`。根目录的包是源；改动后用
+`scripts/vendor.sh <插件目录>` 刷新副本，守卫测试保证每份副本与源一致。
 
 ## Python 插件
 

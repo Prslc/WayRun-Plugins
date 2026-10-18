@@ -18,6 +18,7 @@ wayrun-plugin/
 │   ├── _plugin.py          # Plugin (the decorators)
 │   └── _server.py          # Server / serve (the JSON-RPC loop)
 ├── template/               # cp -r template <new-plugin>; ships icon.svg
+├── scripts/vendor.sh       # refresh a plugin's wayrun_plugin/ copy
 ├── lua/wayrun.lua          # LuaLS stub for the wayrun SDK
 ├── .luarc.json             # points LuaLS's workspace library at lua/
 ├── template.lua            # Lua plugin skeleton (one file)
@@ -39,19 +40,11 @@ wayrun-plugin/
 └── NOTICE                  # bundled-icon attribution (Material Symbols)
 ```
 
-Plugins are independent of each other and only share the `wayrun_plugin`
-package at the workspace root. Each `main.py` bootstraps it with three lines:
-
-```python
-import sys
-from pathlib import Path
-
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-```
-
-so the bootstrap must reach the workspace root: `parents[1]` when the plugin
-directory sits directly under the root (the layout `template/` ships),
-`parents[3]` for the examples nested at `examples/python/<plugin>/`.
+A plugin directory carries its own copy of `wayrun_plugin/` beside `main.py`, so
+it runs anywhere: Python already puts the script's directory on `sys.path`. The
+root package is the source; refresh a plugin's copy with
+`scripts/vendor.sh <plugin-dir>` after changing it. A guard test keeps every
+committed copy identical.
 
 ## Python plugins
 
