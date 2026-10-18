@@ -2,7 +2,7 @@
 -- Text and Markdown notes with a plain-text preview of their opening lines.
 
 local DIR = (wayrun.script_dir() or "") .. "/documents"
-local EXT = { txt = true, md = true, csv = true, json = true, log = true, toml = true, yaml = true, yml = true }
+local EXT = { txt = true, md = true }
 local MAX_PREVIEW = 4096
 
 local function file_uri(path)
