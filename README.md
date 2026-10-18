@@ -1,8 +1,12 @@
 # WayRun-Plugin
 
-External plugin workspace for [WayRun](https://github.com/Prslc/WayRun): Python
-plugins through the shared decorator framework `wayrun_plugin`, Lua plugins as
-one entry script (optionally split into modules) hosted by the WayRun binary.
+Plugin toolkit for [WayRun](https://github.com/Prslc/WayRun): Python plugins
+through the shared decorator framework `wayrun_plugin`, Lua plugins as one entry
+script (optionally split into modules) hosted by the WayRun binary.
+
+The root promises the framework and the templates. `examples/` is read-only
+reference material: nothing there is discovered or registered, and a plugin runs
+only when your own `plugins.toml` names its command.
 
 ## Layout
 
@@ -17,7 +21,7 @@ wayrun-plugin/
 ├── lua/wayrun.lua          # LuaLS stub for the wayrun SDK
 ├── .luarc.json             # points LuaLS's workspace library at lua/
 ├── template.lua            # Lua plugin skeleton (one file)
-├── example/                # worked examples
+├── examples/               # read-only worked examples
 │   ├── python/
 │   │   ├── github/         # GitHub repository search
 │   │   └── todo/           # full example: todo manager
@@ -47,14 +51,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 so the bootstrap must reach the workspace root: `parents[1]` when the plugin
 directory sits directly under the root (the layout `template/` ships),
-`parents[3]` for the examples nested at `example/python/<plugin>/`.
+`parents[3]` for the examples nested at `examples/python/<plugin>/`.
 
 ## Python plugins
 
 A plugin is one directory: copy `template/`, edit `main.py`, register it in
 `plugins.toml`, and the framework owns the stdin/stdout JSON-RPC 2.0 transport.
 The quick start and the full API reference are in
-[docs/en/PYTHON.md](docs/en/PYTHON.md); `example/python/` holds the two worked
+[docs/en/PYTHON.md](docs/en/PYTHON.md); `examples/python/` holds the two worked
 examples.
 
 ## Lua plugins
@@ -67,9 +71,9 @@ the script contract, the full `wayrun` table, the sandbox and registration —
 lives with the launcher that implements it:
 [Lua plugins](https://github.com/Prslc/WayRun/blob/main/docs/en/lua.md).
 
-`example/lua/firefox.lua` (a host with two plugins) and `example/lua/web.lua`
+`examples/lua/firefox.lua` (a host with two plugins) and `examples/lua/web.lua`
 are complete worked examples, reading `places.sqlite` and the web respectively.
-`example/lua/screenshots.lua` and `example/lua/documents.lua` show the split
+`examples/lua/screenshots.lua` and `examples/lua/documents.lua` show the split
 preview column: recent images in `~/Pictures/Screenshots` and plain-text notes
 shipped beside the script, each with open/copy/reveal actions.
 

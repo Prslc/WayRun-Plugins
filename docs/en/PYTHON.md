@@ -56,7 +56,7 @@ plugin.run()
 The bootstrap's `parents[N]` must reach the workspace root (the directory
 holding `wayrun_plugin/`): `parents[1]` for a plugin directly under the root —
 what `cp -r template` gives — and `parents[3]` for the shipped examples nested
-at `example/python/<plugin>/`.
+at `examples/python/<plugin>/`.
 
 ## API
 

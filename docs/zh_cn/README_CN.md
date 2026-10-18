@@ -1,7 +1,10 @@
 # WayRun-Plugin
 
-[WayRun](https://github.com/Prslc/WayRun) 的外部插件工作区：Python 插件走共享的
+[WayRun](https://github.com/Prslc/WayRun) 的插件工具箱：Python 插件走共享的
 装饰器框架 `wayrun_plugin`，Lua 插件是单个脚本文件、由 WayRun 二进制本体承载。
+
+根目录只承诺框架与模板。`examples/` 是只读参考：不会被发现或注册，插件只有在
+你自己的 `plugins.toml` 写下它的 command 后才会运行。
 
 English: [README.md](../../README.md)
 
@@ -15,14 +18,19 @@ wayrun-plugin/
 │   ├── _plugin.py          # Plugin（装饰器）
 │   └── _server.py          # Server / serve（JSON-RPC 循环）
 ├── template/               # cp -r template <新插件目录>；自带 icon.svg
+├── lua/wayrun.lua          # LuaLS 的 wayrun SDK 存根
+├── .luarc.json             # 让 LuaLS 的 workspace library 指向 lua/
 ├── template.lua            # Lua 插件骨架（单文件）
-├── example/                # 完整示例
+├── examples/               # 只读的完整示例
 │   ├── python/
 │   │   ├── github/         # GitHub 仓库搜索
 │   │   └── todo/           # 完整示范：待办管理
 │   └── lua/
 │       ├── firefox.lua     # Firefox 书签与历史（一个主机）
-│       └── web.lua         # 搜索引擎联想词
+│       ├── web.lua         # 搜索引擎联想词
+│       ├── screenshots.lua # 最近截图，带图片预览
+│       └── documents.lua   # 笔记，带文本预览
+│           documents/      # 插件自带的示例笔记
 ├── docs/en/                # PYTHON.md
 ├── docs/zh_cn/             # README_CN.md、PYTHON_CN.md
 ├── tests/test_host.py      # 框架协议契约测试（unittest，无第三方依赖）
@@ -42,7 +50,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 ```
 
 即 bootstrap 必须指向工作区根：插件目录是工作区根的**直接子目录**时用
-`parents[1]`（`template/` 采用的布局）；`example/python/<插件>/` 下的示例嵌套
+`parents[1]`（`template/` 采用的布局）；`examples/python/<插件>/` 下的示例嵌套
 三层，用 `parents[3]`。
 
 ## Python 插件
@@ -58,8 +66,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 它的指南——脚本契约、完整的 `wayrun` 表、沙箱与注册——随实现它的启动器一同维护：
 [Lua 插件](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/lua.md)。
 
-`example/lua/firefox.lua`（一个主机两个插件）与 `example/lua/web.lua` 是两个完整
-示例，分别读取 `places.sqlite` 与网页。
+`examples/lua/firefox.lua`（一个主机两个插件）与 `examples/lua/web.lua` 是两个完整
+示例，分别读取 `places.sqlite` 与网页。`examples/lua/screenshots.lua` 与
+`examples/lua/documents.lua` 演示分栏预览：`~/Pictures/Screenshots` 里的最近截图
+和脚本旁自带的纯文本笔记，各带打开/复制/定位动作。
 
 ## 框架代管的协议行为
 

@@ -1,7 +1,7 @@
 Embedded plugin icons
 =====================
 
-The icon files under `example/` and `template/` are Google Material Symbols
+The icon files under `examples/` and `template/` are Google Material Symbols
 (https://fonts.google.com/icons, https://github.com/google/material-design-icons),
 used as plugin icons so each host ships its own instead of naming a theme or
 built-in glyph. The path data is unmodified; a fixed flat-palette fill colour
@@ -9,12 +9,12 @@ was added.
 
 File                                    Source
 --------------------------------------  --------------------
-example/lua/assets/bookmark_icon.svg    bookmark
-example/lua/assets/clock_icon.svg       history
-example/lua/assets/copy_icon.svg        content-copy
-example/lua/assets/globe_icon.svg       public
-example/python/github/icon.svg          code
-example/python/todo/icon.svg            task_alt
+examples/lua/assets/bookmark_icon.svg   bookmark
+examples/lua/assets/clock_icon.svg      history
+examples/lua/assets/copy_icon.svg       content-copy
+examples/lua/assets/globe_icon.svg      public
+examples/python/github/icon.svg         code
+examples/python/todo/icon.svg           task_alt
 template/icon.svg                       star
 
 Each file below is Material Symbols under the Apache License, Version 2.0.

@@ -55,7 +55,7 @@ plugin.run()
 
 bootstrap 的 `parents[N]` 必须指向工作区根（含 `wayrun_plugin/` 的目录）：插件目录
 直接在根下时用 `parents[1]`（即 `cp -r template` 得到的布局），
-`example/python/<插件>/` 下的示例嵌套三层，用 `parents[3]`。
+`examples/python/<插件>/` 下的示例嵌套三层，用 `parents[3]`。
 
 ## API 参考
 
