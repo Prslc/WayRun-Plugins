@@ -36,7 +36,7 @@ wayrun-plugin/
 │           documents/      # sample notes the plugin ships
 ├── docs/en/                # PYTHON.md
 ├── docs/zh_cn/             # README_CN.md, PYTHON_CN.md
-├── tests/test_host.py      # framework protocol contract tests (unittest)
+├── tests/                  # protocol contract, golden wire and vendoring tests
 ├── ruff.toml               # lint + format config
 ├── pyrightconfig.json      # LSP config
 └── NOTICE                  # bundled-icon attribution (Material Symbols)

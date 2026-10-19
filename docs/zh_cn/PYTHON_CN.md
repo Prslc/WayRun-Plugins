@@ -1,6 +1,6 @@
 # Python 插件
 
-工作区的共享装饰器框架 `wayrun_plugin` 代管 stdin/stdout 的 JSON-RPC 2.0 传输；
+工作区的共享装饰器框架 `wayrun_plugin` 负责 stdin/stdout 的 JSON-RPC 2.0 传输；
 一个插件就是一个带 `main.py` 的目录。
 
 ## 快速开始
@@ -13,7 +13,7 @@ cp -r template my-plugin
 chmod +x my-plugin/main.py
 ```
 
-在 `~/.config/wayrun/plugins.toml` 注册（`command` 是单个可执行令牌，用绝对路径；
+在 `~/.config/wayrun/plugins.toml` 注册（`command` 是单个可执行文件名，用绝对路径；
 全部字段见启动器的
 [plugins.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/plugins.md#条目字段)）：
 
@@ -65,7 +65,7 @@ plugin.run()
 |------|------|------|
 | `id` | 是 | 插件 id，必须与 `plugins.toml` 条目一致 |
 | `name` | 否 | 显示名（空则回退为配置的 id） |
-| `keyword` | 否 | 触发前缀（空 = 默认触发） |
+| `keyword` | 否 | 触发前缀（空 = 默认提供者） |
 | `icon` | 否 | 插件自带图标文件的绝对路径 |
 | `description` | 否 | 就绪提示文案 |
 | `api` | 否 | 编写时所针对的插件契约版本；默认即框架所针对的那一个，通常无需填写 |
@@ -73,13 +73,13 @@ plugin.run()
 ### `@plugin.method(name)`
 
 处理函数声明了参数则收到请求 `params`；零参数的处理函数则不传参调用。
-方法抛异常返回 `-32603`。返回 `Item`（或含 `Item` 的列表）视为结果条目，
-走与 `search` 相同的归一化（协议键全量、`icon` 回退）；其它返回值（如普通
+方法抛异常返回 `-32603`。返回 `Item`（或含 `Item` 的列表）视为结果项，
+走与 `search` 相同的归一化（协议键全量、`icon` 回退）；其他返回值（如普通
 dict）原样作为 `result` 序列化。
 
 ### `@plugin.default_view`
 
-注册插件的**默认视图**——后端以关键词 + 空格打开插件（空查询）时，会向主机
+注册插件的**默认视图**：后端以关键词 + 空格打开插件（空查询）时，会向主机
 发起 `top` 请求。零参数处理函数，返回结果行，归一化与 `search` 相同；启动器
 拿到这些行之后怎么做，见
 [WayRun jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md#关键词插件的默认视图)：
@@ -108,7 +108,7 @@ def top() -> list[Item]:
 [jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md#结果项)
 定义。四个协议键（`title`/`summary`/`on_click`/`icon`）总是全量输出
 （未设置者为 `null`）；`actions` 与 `icon_shape` 仅在设置时输出。`icon` 为
-`None` 时自动回退到插件图标——多数插件无需逐条重复设置图标。
+`None` 时自动回退到插件图标，多数插件无需逐条重复设置图标。
 
 `icon_shape="circle"` 把图标框裁成圆形，头像这类图标需要它。
 
@@ -121,15 +121,14 @@ Item(
 )
 ```
 
-`actions` 给该行的 `Shift+Enter` 面板挂条目——用 `panel()` 构造：
+`actions` 给该行的 `Shift+Enter` 动作面板挂条目，用 `panel()` 构造：
 
 ```python
 Item(title="Firefox", actions=[panel("Copy URL", copy_text(url), id="copy_url")])
 ```
 
-条目的 `icon` 是图标规范（插件自带文件的
-绝对路径，与所有图标一样）；`id` 是"被记住的默认动作"所指的稳定名字。启动器
-在这些条目之外补了什么、默认动作如何生效，见
+条目的 `icon` 与所有图标一样，是插件自带文件的绝对路径；`id` 是“被记住的默认动作”
+所指的稳定名字。启动器在这些条目之外补了什么、默认动作如何生效，见
 [WayRun plugins.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/plugins.md#结果动作)。
 
 ### 图标
@@ -142,14 +141,14 @@ Item(title="Firefox", actions=[panel("Copy URL", copy_text(url), id="copy_url")]
 `icon` 既是插件身份（`?` 列表与关键词提示），也是逐行回退值；行自身的 `icon`
 覆盖它。
 
-启动器不会拉取网络图片。插件自己下载并缓存到插件目录，再把缓存文件的绝对路径作为
+启动器不会下载网络图片。插件自己下载并缓存到插件目录，再把缓存文件的绝对路径作为
 `icon`；缓存何时刷新也由插件决定。
 
 ### 本地化
 
-启动器在启动时解析一次 locale，并以 `WAYRUN_LOCALE` 导出——即它自己词表使用的
-stem（`en`、`zh_cn`…）。在 import 时读取它，插件自身的 `name` 与 `description`
-也能跟着切换：
+启动器在启动时解析一次界面语言，把结果写入 `WAYRUN_LOCALE`；它的值就是启动器自己
+文案表使用的语言标识（`en`、`zh_cn` 等）。在 import 时读取它，插件自身的 `name`
+与 `description` 也能跟着切换：
 
 ```python
 LOCALE = os.environ.get("WAYRUN_LOCALE", "en")
@@ -160,9 +159,9 @@ CATALOGS = {
 STRINGS = CATALOGS.get(LOCALE, CATALOGS["en"])
 ```
 
-翻译插件自己写的文案——行标题与摘要、动作标题、空状态与错误提示——不要翻译数据：
-仓库名、文件名、命令、URI 与剪贴板文本都不是翻译对象。插件自己的词表与回退由插件
-负责，启动器不会翻译插件文本；切换语言需要重启。
+要翻译的是插件自己写的文案：行标题与摘要、动作标题、空状态与错误提示。不要翻译
+数据：仓库名、文件名、命令、URI 与剪贴板文本都不是翻译对象。文案表与回退由插件
+自己负责，启动器不会翻译插件文本；切换语言需要重启。
 
 ### 命令构造器
 
@@ -207,19 +206,18 @@ return [hint("金额无效：'abc'", "例：cc 100 usd cny")]
 
 ### `plugin.run()`
 
-`main.py` 最后一行。阻塞读 stdin 直到 EOF：应答 `ping` / `list_plugins` /
-`search` / `top` 与所有注册方法。无 `id` 的请求是 notification，不产生响应，
-见
+`main.py` 最后一行。阻塞读 stdin 直到 EOF：应答 `ping`、`list_plugins`、`search`、
+`top` 与所有注册方法。无 `id` 的请求是通知，不产生响应，见
 [WayRun jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md)。
 
-循环服务到 EOF，因此同一个主机两种用法皆可：逐次 fork（一个请求后 stdin 关闭），
-或在 `plugins.toml` 中设 `resident = true` 后跨调用保温。这让每次调用约 0.1ms，
-而每次新起解释器要约 40ms；该开关见
+循环服务到 EOF，因此同一个主机支持两种用法：每次调用新起进程（一个请求后 stdin
+关闭），或在 `plugins.toml` 中设 `resident = true` 后跨调用保留进程。常驻时每次
+调用约 0.1 ms，而每次新起解释器约 40 ms；该开关见
 [WayRun plugins.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/plugins.md#外部主机)。
 
 ### `Plugin`、`Server`、`serve`（进阶）
 
-`plugin` 是模块级的 `Plugin()` 单例，对应「一进程一插件」的常见写法。测试或内嵌
+`plugin` 是模块级的 `Plugin()` 单例，对应一个进程一个插件的常见写法。测试或内嵌
 时，可自建 `Plugin` 注册处理函数，再把请求行喂给 `Server(plugin).handle(line)`；
 `serve(plugin)` 就是 `plugin.run()` 委托的 stdin 循环。
 
@@ -227,13 +225,13 @@ return [hint("金额无效：'abc'", "例：cc 100 usd cny")]
 
 `search` 处理函数可返回：
 
-- `list[Item]` / `list[dict]` —— 常规；`dict` 会被归一化为 `Item`
+- `list[Item]` / `list[dict]`：常规；`dict` 会被归一化为 `Item`
   （缺省字段补 `null`，`icon` 同样回退到插件图标）
-- 单个 `Item` / `dict` —— 自动包装成单元素列表
+- 单个 `Item` / `dict`：自动包装成单元素列表
 
 ### 异常语义
 
-- `search` 抛异常：框架捕获并返回一条错误结果条目
-  （`title: "Search failed"`，`summary: 异常信息`），失败可见于启动器 UI，
+- `search` 抛异常：框架捕获并返回一条错误结果项
+  （`title: "Search failed"`，`summary: 异常信息`），失败会显示在启动器界面，
   进程不崩溃。插件可用自己的 `try/except` 覆盖出更友好的文案。
 - 自定义方法（`@plugin.method`）抛异常：返回 `-32603 Internal error`。

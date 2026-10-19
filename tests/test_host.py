@@ -33,7 +33,12 @@ def make_plugin() -> Plugin:
     def search(text: str) -> list[Item | dict[str, Any]]:
         return [
             Item(title=text),
-            {"title": "dict row", "summary": "s", "on_click": run("true")},
+            {
+                "title": "dict row",
+                "summary": "s",
+                "on_click": run("true"),
+                "icon_shape": "circle",
+            },
         ]
 
     @p.method("echo")
@@ -97,8 +102,12 @@ class ServerTest(unittest.TestCase):
         self.assertEqual(rows[0]["icon"], "/opt/plugin/icon.svg")  # Item icon fallback
         self.assertEqual(rows[1]["title"], "dict row")  # plain dict accepted
         self.assertEqual(rows[1]["icon"], "/opt/plugin/icon.svg")  # dict icon fallback
-        for row in rows:  # all four keys present
-            self.assertEqual(set(row), {"title", "summary", "on_click", "icon"})
+        self.assertEqual(rows[1]["icon_shape"], "circle")  # dict shape kept
+        self.assertEqual(set(rows[0]), {"title", "summary", "on_click", "icon"})
+        self.assertEqual(
+            set(rows[1]),
+            {"title", "summary", "on_click", "icon", "icon_shape"},
+        )
 
     def test_search_plugin_param_must_match(self) -> None:
         ok = self.req(
