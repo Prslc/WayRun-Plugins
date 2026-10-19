@@ -107,8 +107,10 @@ def top() -> list[Item]:
 一条搜索结果，形状由启动器的
 [jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/jsonrpc.md#结果项)
 定义。四个协议键（`title`/`summary`/`on_click`/`icon`）总是全量输出
-（未设置者为 `null`）；`actions` 仅在设置时输出。`icon` 为
+（未设置者为 `null`）；`actions` 与 `icon_shape` 仅在设置时输出。`icon` 为
 `None` 时自动回退到插件图标——多数插件无需逐条重复设置图标。
+
+`icon_shape="circle"` 把图标框裁成圆形，头像这类图标需要它。
 
 ```python
 Item(
@@ -139,6 +141,28 @@ Item(title="Firefox", actions=[panel("Copy URL", copy_text(url), id="copy_url")]
 
 `icon` 既是插件身份（`?` 列表与关键词提示），也是逐行回退值；行自身的 `icon`
 覆盖它。
+
+启动器不会拉取网络图片。插件自己下载并缓存到插件目录，再把缓存文件的绝对路径作为
+`icon`；缓存何时刷新也由插件决定。
+
+### 本地化
+
+启动器在启动时解析一次 locale，并以 `WAYRUN_LOCALE` 导出——即它自己词表使用的
+stem（`en`、`zh_cn`…）。在 import 时读取它，插件自身的 `name` 与 `description`
+也能跟着切换：
+
+```python
+LOCALE = os.environ.get("WAYRUN_LOCALE", "en")
+CATALOGS = {
+    "en": {"search": "Search", "copy": "Copy URL"},
+    "zh_cn": {"search": "搜索", "copy": "复制链接"},
+}
+STRINGS = CATALOGS.get(LOCALE, CATALOGS["en"])
+```
+
+翻译插件自己写的文案——行标题与摘要、动作标题、空状态与错误提示——不要翻译数据：
+仓库名、文件名、命令、URI 与剪贴板文本都不是翻译对象。插件自己的词表与回退由插件
+负责，启动器不会翻译插件文本；切换语言需要重启。
 
 ### 命令构造器
 

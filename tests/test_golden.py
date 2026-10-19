@@ -58,6 +58,17 @@ ROWS: list[tuple[Item, str | None, dict[str, Any]]] = [
             "icon": "/opt/identity.svg",
         },
     ),
+    (
+        Item(title="circle", icon="/opt/avatar.png", icon_shape="circle"),
+        None,
+        {
+            "title": "circle",
+            "summary": None,
+            "on_click": None,
+            "icon": "/opt/avatar.png",
+            "icon_shape": "circle",
+        },
+    ),
 ]
 
 COMMANDS: list[tuple[Any, dict[str, Any]]] = [

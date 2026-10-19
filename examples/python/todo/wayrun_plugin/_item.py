@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, Literal
 
 # One wire command, ``{"type": ..., ...}``; see the WayRun protocol docs.
 Command = dict[str, Any]
@@ -17,11 +17,11 @@ class Item:
     """One search-result row.
 
     ``title`` is required; the rest default to "not set". The four protocol
-    keys are always emitted on the wire, with ``actions`` only when set. An
-    unset ``icon`` falls back to the plugin icon.
+    keys are always emitted on the wire, with ``actions`` and ``icon_shape``
+    only when set. An unset ``icon`` falls back to the plugin icon.
 
     ``actions`` fills the row's ``Shift+Enter`` panel; build entries with
-    ``panel()``.
+    ``panel()``. ``icon_shape="circle"`` clips the icon box, as an avatar needs.
     """
 
     title: str
@@ -29,6 +29,7 @@ class Item:
     on_click: Command | None = None
     icon: str | None = None
     actions: list[ActionEntry] | None = None
+    icon_shape: Literal["circle"] | None = None
 
     def as_dict(self, default_icon: str | None = None) -> dict[str, Any]:
         """The wire form for this row, with the plugin icon as fallback."""
@@ -40,6 +41,8 @@ class Item:
         }
         if self.actions:
             item["actions"] = self.actions
+        if self.icon_shape is not None:
+            item["icon_shape"] = self.icon_shape
         return item
 
 

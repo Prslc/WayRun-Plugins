@@ -109,8 +109,11 @@ A plugin with no default view still shows its identity card (`name` +
 One result row, in the shape the launcher's
 [jsonrpc.md](https://github.com/Prslc/WayRun/blob/main/docs/en/jsonrpc.md#result-items)
 defines. The four protocol keys (`title`, `summary`, `on_click`, `icon`) are
-always emitted (unset ones as `null`); `actions` is added only when set. An
-unset `icon` falls back to the plugin icon, so most rows need no per-row icon.
+always emitted (unset ones as `null`); `actions` and `icon_shape` are added only
+when set. An unset `icon` falls back to the plugin icon, so most rows need no
+per-row icon.
+
+`icon_shape="circle"` clips the icon box to a circle, as an avatar needs.
 
 ```python
 Item(
@@ -144,6 +147,31 @@ one is the launcher's rule, in its
 
 `icon` is the plugin identity (the `?` list and the keyword hint) and the
 per-row fallback; a row's own `icon` overrides it.
+
+The launcher never fetches a remote image. Download it yourself, cache it under
+the plugin directory, and pass the cached file's absolute path; refreshing that
+cache is the plugin's job too.
+
+### Localisation
+
+The launcher resolves the locale once and exports it as `WAYRUN_LOCALE`, the
+stem its own tables use (`en`, `zh_cn`, …). Read it at import time so the
+plugin's own `name` and `description` can follow it too:
+
+```python
+LOCALE = os.environ.get("WAYRUN_LOCALE", "en")
+CATALOGS = {
+    "en": {"search": "Search", "copy": "Copy URL"},
+    "zh_cn": {"search": "搜索", "copy": "复制链接"},
+}
+STRINGS = CATALOGS.get(LOCALE, CATALOGS["en"])
+```
+
+Translate the prose the plugin authors — row titles and summaries, action
+titles, empty and error messages — and leave data alone: repository names, file
+names, commands, URIs and clipboard text are not translations. The plugin owns
+its catalog and fallback; the launcher never translates plugin text, and a
+locale change needs a restart.
 
 ### Command builders
 

@@ -114,6 +114,7 @@ class Server:
                     on_click=item.get("on_click"),
                     icon=item.get("icon"),
                     actions=item.get("actions"),
+                    icon_shape=item.get("icon_shape"),
                 )
             rows.append(item.as_dict(default_icon))
         return rows
