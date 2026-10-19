@@ -148,9 +148,11 @@ one is the launcher's rule, in its
 `icon` is the plugin identity (the `?` list and the keyword hint) and the
 per-row fallback; a row's own `icon` overrides it.
 
-The launcher never fetches a remote image. Download it yourself, cache it under
-the plugin directory, and pass the cached file's absolute path; refreshing that
-cache is the plugin's job too.
+The launcher fetches a row's remote image: a row's own `icon` may be an
+`https://` URL, and the core caches it in the background, so the row fills in
+when the image lands. Pair an avatar with `icon_shape="circle"`. A preview's
+`image` path takes a URL the same way; the identity and action icons stay local
+files the plugin ships.
 
 ### Localisation
 

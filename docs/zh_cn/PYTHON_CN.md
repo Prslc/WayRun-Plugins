@@ -141,8 +141,9 @@ Item(title="Firefox", actions=[panel("Copy URL", copy_text(url), id="copy_url")]
 `icon` 既是插件身份（`?` 列表与关键词提示），也是逐行回退值；行自身的 `icon`
 覆盖它。
 
-启动器不会下载网络图片。插件自己下载并缓存到插件目录，再把缓存文件的绝对路径作为
-`icon`；缓存何时刷新也由插件决定。
+结果行的远程图片由启动器抓取：行自身的 `icon` 可以是 `https://` URL，core 会在后台
+缓存，图片到达后自动补上；头像配 `icon_shape="circle"`。预览的 `image` 路径同样可以
+是 URL；插件身份与动作的图标仍是插件自带的本地文件。
 
 ### 本地化
 
