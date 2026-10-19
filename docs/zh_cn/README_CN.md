@@ -1,12 +1,12 @@
 # WayRun-Plugin
 
+中文 | [English](../../README.md)
+
 [WayRun](https://github.com/Prslc/WayRun) 的插件工具箱：Python 插件走共享的
 装饰器框架 `wayrun_plugin`，Lua 插件是单个脚本文件、由 WayRun 二进制本体承载。
 
 根目录只承诺框架与模板。`examples/` 是只读参考：不会被发现或注册，插件只有在
 你自己的 `plugins.toml` 写下它的 command 后才会运行。
-
-English: [README.md](../../README.md)
 
 ## 目录结构
 

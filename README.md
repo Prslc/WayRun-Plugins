@@ -1,5 +1,7 @@
 # WayRun-Plugin
 
+English | [Chinese](docs/zh_cn/README_CN.md)
+
 Plugin toolkit for [WayRun](https://github.com/Prslc/WayRun): Python plugins
 through the shared decorator framework `wayrun_plugin`, Lua plugins as one entry
 script (optionally split into modules) hosted by the WayRun binary.
