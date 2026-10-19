@@ -71,6 +71,9 @@ function wayrun.log(message) end
 ---@return integer
 function wayrun.time() end
 
+---@return string
+function wayrun.locale() end
+
 ---@param name string
 ---@return string?
 function wayrun.env(name) end
@@ -96,6 +99,10 @@ function wayrun.script_dir() end
 ---@return string?
 function wayrun.plugin_dir(id) end
 
+---@param id string
+---@return string?
+function wayrun.plugin_cache_dir(id) end
+
 ---@param name string
 ---@return any
 function wayrun.import(name) end
@@ -108,6 +115,10 @@ function wayrun.fs.read(name) end
 ---@param data string
 ---@return boolean
 function wayrun.fs.write(path, data) end
+
+---@param path string
+---@return boolean
+function wayrun.fs.delete(path) end
 
 ---@param dir string
 ---@return string[]?
