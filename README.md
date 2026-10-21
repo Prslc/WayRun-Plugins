@@ -31,6 +31,7 @@ wayrun-plugin/
 │   └── lua/
 │       ├── firefox.lua     # Firefox bookmarks and history (one host)
 │       ├── web.lua         # search-engine suggestions
+│       ├── cliphist.lua    # clipboard history over cliphist
 │       ├── screenshots.lua # recent screenshots with image previews
 │       └── documents.lua   # notes with text previews
 │           documents/      # sample notes the plugin ships
@@ -71,6 +72,10 @@ are complete worked examples, reading `places.sqlite` and the web respectively.
 `examples/lua/screenshots.lua` and `examples/lua/documents.lua` show the split
 preview column: recent images in `~/Pictures/Screenshots` and plain-text notes
 shipped beside the script, each with open/copy/reveal actions.
+`examples/lua/cliphist.lua` searches the `cliphist` history and copies an entry
+back with `wl-copy` (both on `PATH`); it declares `exec = { "cliphist" }`, so
+register it with `keyword = "c"` and `resident = true` to fetch the list once
+per typing burst.
 
 The repo vendors the LuaLS stub at `lua/wayrun.lua`; `.luarc.json` points
 `Lua.workspace.library` at it, so `wayrun.` completes in `template.lua` and the
