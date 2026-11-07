@@ -6,6 +6,11 @@ local home = wayrun.home() or ""
 local DIR = home .. "/Pictures/Screenshots"
 local EXT = { png = true, jpg = true, jpeg = true, webp = true, gif = true, svg = true, bmp = true }
 
+local zh = wayrun.locale():match("^zh") ~= nil
+local function t(en, cn)
+  return zh and cn or en
+end
+
 local function recent(text)
   local query = text and text:lower() or ""
   local items = {}
@@ -33,8 +38,8 @@ local function recent(text)
       preview = { type = "image", path = item.path },
       on_click = { type = "open", uri = wayrun.file_uri(item.path) },
       actions = {
-        { title = "Copy path", id = "copy_path", action = { type = "copy", text = item.path } },
-        { title = "Reveal", id = "reveal", action = { type = "reveal", uri = wayrun.file_uri(item.path) } },
+        { title = t("Copy path", "复制路径"), id = "copy_path", action = { type = "copy", text = item.path } },
+        { title = t("Reveal", "在文件管理器中显示"), id = "reveal", action = { type = "reveal", uri = wayrun.file_uri(item.path) } },
       },
     }
   end
@@ -44,9 +49,9 @@ end
 return {
   {
     id = "screenshots",
-    name = "Screenshots",
+    name = t("Screenshots", "截图"),
     icon = wayrun.icon("image-x-generic"),
-    description = "Recent screenshots",
+    description = t("Recent screenshots", "最近的截图"),
     api = 1,
     read = { "~/Pictures/Screenshots" },
     search = function(text) return recent(text) end,

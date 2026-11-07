@@ -5,6 +5,11 @@ local DIR = (wayrun.script_dir() or "") .. "/documents"
 local EXT = { txt = true, md = true }
 local MAX_PREVIEW = 4096
 
+local zh = wayrun.locale():match("^zh") ~= nil
+local function t(en, cn)
+  return zh and cn or en
+end
+
 local function excerpt(text)
   if #text <= MAX_PREVIEW then
     return text
@@ -54,8 +59,8 @@ local function recent(text)
       preview = (body and body ~= "") and { type = "text", text = body } or nil,
       on_click = { type = "open", uri = wayrun.file_uri(item.path) },
       actions = {
-        { title = "Copy path", id = "copy_path", action = { type = "copy", text = item.path } },
-        { title = "Reveal", id = "reveal", action = { type = "reveal", uri = wayrun.file_uri(item.path) } },
+        { title = t("Copy path", "复制路径"), id = "copy_path", action = { type = "copy", text = item.path } },
+        { title = t("Reveal", "在文件管理器中显示"), id = "reveal", action = { type = "reveal", uri = wayrun.file_uri(item.path) } },
       },
     }
   end
@@ -65,9 +70,9 @@ end
 return {
   {
     id = "documents",
-    name = "Documents",
+    name = t("Documents", "笔记"),
     icon = wayrun.icon("text-x-generic"),
-    description = "Text and Markdown notes",
+    description = t("Text and Markdown notes", "文本与 Markdown 笔记"),
     api = 1,
     search = function(text) return recent(text) end,
     top = function() return recent("") end,

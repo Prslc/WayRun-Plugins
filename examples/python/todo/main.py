@@ -25,6 +25,33 @@ ICON = str(Path(__file__).resolve().with_name("icon.svg"))
 DATA_DIR = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config")) / "wayrun"
 DATA_PATH = DATA_DIR / "todo.json"
 
+LOCALE = os.environ.get("WAYRUN_LOCALE", "en")
+CATALOGS = {
+    "en": {
+        "name": "Todo",
+        "description": "Manage todos: type to add, Enter toggles",
+        "corrupt": "Corrupt todo data",
+        "corrupt_summary": "Cannot read {path}; delete it",
+        "delete": "Delete",
+        "done": "Done · Enter reopens",
+        "open": "Open · Enter marks done",
+        "add": 'Add "{text}"',
+        "add_summary": "Enter adds it",
+    },
+    "zh_cn": {
+        "name": "待办",
+        "description": "管理待办：输入即添加，Enter 切换完成",
+        "corrupt": "待办数据损坏",
+        "corrupt_summary": "无法读取 {path}；请删除它",
+        "delete": "删除",
+        "done": "已完成 · Enter 重新打开",
+        "open": "未完成 · Enter 标记完成",
+        "add": "添加「{text}」",
+        "add_summary": "Enter 添加",
+    },
+}
+STRINGS = CATALOGS.get(LOCALE, CATALOGS["en"])
+
 # A `run` command goes through a shell, so quote the path.
 THIS_PATH = str(Path(__file__).resolve())
 THIS = shlex.quote(THIS_PATH)
@@ -53,7 +80,8 @@ def save(data: dict[str, Any]) -> None:
 
 def broken_item() -> Item:
     return Item(
-        title="Corrupt todo data", summary=f"Cannot read {DATA_PATH}; delete it"
+        title=STRINGS["corrupt"],
+        summary=STRINGS["corrupt_summary"].format(path=DATA_PATH),
     )
 
 
@@ -61,17 +89,17 @@ def row(item: dict[str, Any]) -> Item:
     """A todo row; Enter toggles its state, the panel offers Delete."""
     toggle = run(f"{THIS} toggle {item['id']}")
     # no id: deleting a todo stays out of the remembered-default reach
-    delete = panel("Delete", run(f"{THIS} delete {item['id']}"))
+    delete = panel(STRINGS["delete"], run(f"{THIS} delete {item['id']}"))
     if item["done"]:
         return Item(
             title=item["text"],
-            summary="Done · Enter reopens",
+            summary=STRINGS["done"],
             on_click=toggle,
             actions=[delete],
         )
     return Item(
         title=item["text"],
-        summary="Open · Enter marks done",
+        summary=STRINGS["open"],
         on_click=toggle,
         actions=[delete],
     )
@@ -79,10 +107,10 @@ def row(item: dict[str, Any]) -> Item:
 
 @plugin.search(
     id="todo",
-    name="Todo",
+    name=STRINGS["name"],
     keyword="todo",  # must match the plugins.toml keyword
     icon=ICON,
-    description="Manage todos: type to add, Enter toggles",
+    description=STRINGS["description"],
 )
 def search(text: str) -> list[Item]:
     data = load()
@@ -94,7 +122,13 @@ def search(text: str) -> list[Item]:
         return [row(it) for it in matches]
     # No match: offer to add the input as a new todo.
     action = run(f"{THIS} add {shlex.quote(text)}")
-    return [Item(title=f'Add "{text}"', summary="Enter adds it", on_click=action)]
+    return [
+        Item(
+            title=STRINGS["add"].format(text=text),
+            summary=STRINGS["add_summary"],
+            on_click=action,
+        )
+    ]
 
 
 @plugin.default_view

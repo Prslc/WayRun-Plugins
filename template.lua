@@ -16,12 +16,17 @@
 -- The full surface (wayrun.sqlite, wayrun.http, wayrun.fs, ...) is documented
 -- at https://github.com/Prslc/WayRun/blob/main/docs/en/lua.md.
 
+local zh = wayrun.locale():match("^zh") ~= nil
+local function t(en, cn)
+  return zh and cn or en
+end
+
 return {
   {
     id = "my-plugin",                    -- must match the plugins.toml id
-    name = "My Plugin",
+    name = t("My Plugin", "我的插件"),
     -- icon = wayrun.script_dir() .. "/icon.svg", -- an icon file you ship beside the script
-    description = "Does something useful",
+    description = t("Does something useful", "做点有用的事"),
     api = 1,                             -- the plugin contract it was written against
     -- env = { "MY_TOKEN" },             -- the exact env names it may read
     -- read = { "~/Documents" },         -- the areas it may look inside
@@ -32,7 +37,7 @@ return {
       end
       return {
         {
-          title = "You searched: " .. text,
+          title = t("You searched: ", "你搜索了：") .. text,
           on_click = { type = "copy", text = text },
         },
       }

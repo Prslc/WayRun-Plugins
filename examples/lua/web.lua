@@ -4,6 +4,11 @@
 
 local assets = wayrun.script_dir() .. "/assets/"
 
+local zh = wayrun.locale():match("^zh") ~= nil
+local function t(en, cn)
+  return zh and cn or en
+end
+
 local ENGINES = {
   google = {
     name = "Google",
@@ -24,7 +29,7 @@ local engine = ENGINES.google
 
 local icon = engine.icon
 local copy_icon = assets .. "copy_icon.svg"
-local summary = "Search on " .. engine.name
+local summary = t("Search on " .. engine.name, "在 " .. engine.name .. " 上搜索")
 
 local function result_url(query)
   return engine.search_url .. wayrun.urlencode(query)
@@ -39,7 +44,7 @@ local function row(title, query)
     icon = icon,
     actions = {
       {
-        title = "Copy URL",
+        title = t("Copy URL", "复制链接"),
         action = { type = "copy", text = uri },
         icon = copy_icon,
         id = "copy_url",
@@ -53,7 +58,7 @@ return {
     id = "web-search",
     name = engine.name,
     icon = icon,
-    description = "Search " .. engine.name .. " suggestions",
+    description = t("Search " .. engine.name .. " suggestions", "搜索 " .. engine.name .. " 的建议"),
     api = 1,
     search = function(text)
       if text == "" then
@@ -61,7 +66,7 @@ return {
       end
       local res = wayrun.http.get(engine.suggest_url, { q = text }, { ttl = 300 })
       local payload = wayrun.json.decode(res.body)
-      local out = { row("Search: " .. text, text) }
+      local out = { row(t("Search: ", "搜索：") .. text, text) }
       local suggestions = type(payload) == "table" and payload[2] or nil
       if type(suggestions) == "table" then
         for _, phrase in ipairs(suggestions) do

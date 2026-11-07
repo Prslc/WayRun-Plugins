@@ -6,7 +6,13 @@ local assets = wayrun.script_dir() .. "/assets/"
 local bookmarks_icon = assets .. "bookmark_icon.svg"
 local history_icon = assets .. "clock_icon.svg"
 local copy_icon = assets .. "copy_icon.svg"
-local copy_title = "Copy URL"
+
+local zh = wayrun.locale():match("^zh") ~= nil
+local function t(en, cn)
+  return zh and cn or en
+end
+
+local copy_title = t("Copy URL", "复制链接")
 
 local function copy_action(uri)
   if uri:sub(1, 4) ~= "http" then
@@ -87,7 +93,7 @@ local function rows(mode, text, icon)
   local out = {}
   for _, record in ipairs(records) do
     local item = {
-      title = record.title or "[no title]",
+      title = record.title or t("[no title]", "[无标题]"),
       summary = record.url,
       on_click = { type = "open", uri = record.url },
       icon = icon,
@@ -115,18 +121,18 @@ local AREAS = { "~/.mozilla/firefox", "~/.config/mozilla/firefox" }
 return {
   {
     id = "firefox-bookmarks",
-    name = "Bookmarks",
+    name = t("Bookmarks", "书签"),
     icon = bookmarks_icon,
-    description = "Search Firefox bookmarks",
+    description = t("Search Firefox bookmarks", "搜索 Firefox 书签"),
     api = 1,
     read = AREAS,
     search = searcher("bookmarks", bookmarks_icon),
   },
   {
     id = "firefox-history",
-    name = "History",
+    name = t("History", "历史"),
     icon = history_icon,
-    description = "Search Firefox history",
+    description = t("Search Firefox history", "搜索 Firefox 历史"),
     api = 1,
     read = AREAS,
     search = searcher("history", history_icon),

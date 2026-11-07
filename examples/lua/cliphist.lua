@@ -2,6 +2,12 @@
 -- Clipboard history over `cliphist`; a row copies its entry back with wl-copy.
 
 local icon = wayrun.icon("papirus:clipboard") or wayrun.icon("edit-paste")
+
+local zh = wayrun.locale():match("^zh") ~= nil
+local function t(en, cn)
+  return zh and cn or en
+end
+
 local MAX_ROWS = 50
 -- `wayrun.time()` is whole seconds, so the cache lives for the second it was
 -- fetched in; `top` (entering the keyword) always refetches first.
@@ -63,9 +69,9 @@ end
 return {
   {
     id = "clipboard",
-    name = "Clipboard History",
+    name = t("Clipboard History", "剪贴板历史"),
     icon = icon,
-    description = "Search clipboard history",
+    description = t("Search clipboard history", "搜索剪贴板历史"),
     api = 1,
     exec = { "cliphist" },
     -- exec clears the environment; a custom XDG_CACHE_HOME moves cliphist's

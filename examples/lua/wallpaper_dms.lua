@@ -6,6 +6,11 @@ local home = wayrun.home() or ""
 local DIR = home .. "/Pictures/Wallpapers"
 local EXT = { png = true, jpg = true, jpeg = true, webp = true, gif = true, bmp = true }
 
+local zh = wayrun.locale():match("^zh") ~= nil
+local function t(en, cn)
+  return zh and cn or en
+end
+
 local function quote(s)
   return "'" .. s:gsub("'", "'\\''") .. "'"
 end
@@ -38,12 +43,12 @@ local function list(text)
     end
     rows[#rows + 1] = {
       title = item.name,
-      summary = (item.path == current and "Current · " or "") .. item.path,
+      summary = (item.path == current and t("Current · ", "当前 · ") or "") .. item.path,
       preview = { type = "image", path = item.path },
       on_click = { type = "run", cmd = "dms ipc call wallpaper set " .. quote(item.path) },
       actions = {
-        { title = "Copy path", id = "copy_path", action = { type = "copy", text = item.path } },
-        { title = "Reveal", id = "reveal", action = { type = "reveal", uri = wayrun.file_uri(item.path) } },
+        { title = t("Copy path", "复制路径"), id = "copy_path", action = { type = "copy", text = item.path } },
+        { title = t("Reveal", "在文件管理器中显示"), id = "reveal", action = { type = "reveal", uri = wayrun.file_uri(item.path) } },
       },
     }
   end
@@ -53,9 +58,9 @@ end
 return {
   {
     id = "wallpaper",
-    name = "Wallpaper",
+    name = t("Wallpaper", "壁纸"),
     icon = wayrun.icon("preferences-desktop-wallpaper"),
-    description = "Switch the DMS wallpaper",
+    description = t("Switch the DMS wallpaper", "切换 DMS 壁纸"),
     api = 1,
     exec = { "dms" },
     read = { "~/Pictures/Wallpapers" },

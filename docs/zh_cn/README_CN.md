@@ -22,16 +22,7 @@ wayrun-plugin/
 ├── lua/wayrun.lua          # LuaLS 的 wayrun SDK 存根
 ├── .luarc.json             # 让 LuaLS 的 workspace library 指向 lua/
 ├── template.lua            # Lua 插件骨架（单文件）
-├── examples/               # 只读的完整示例
-│   ├── python/
-│   │   ├── github/         # GitHub 仓库搜索
-│   │   └── todo/           # 完整示范：待办管理
-│   └── lua/
-│       ├── firefox.lua     # Firefox 书签与历史（一个主机）
-│       ├── web.lua         # 搜索引擎联想词
-│       ├── screenshots.lua # 最近截图，带图片预览
-│       └── documents.lua   # 笔记，带文本预览
-│           documents/      # 插件自带的示例笔记
+├── examples/               # 只读的完整示例，列在 WayRun 的插件目录中
 ├── docs/en/                # PYTHON.md
 ├── docs/zh_cn/             # README_CN.md、PYTHON_CN.md
 ├── tests/                  # 协议契约、协议语料与副本一致性测试
@@ -57,10 +48,7 @@ wayrun-plugin/
 它的指南（脚本契约、完整的 `wayrun` 表、沙箱与注册）随实现它的启动器一同维护：
 [Lua 插件](https://github.com/Prslc/WayRun/blob/main/docs/zh_cn/lua.md)。
 
-`examples/lua/firefox.lua`（一个主机进程承载两个插件）与 `examples/lua/web.lua` 是
-两个完整示例，分别读取 `places.sqlite` 与网页。`examples/lua/screenshots.lua` 与
-`examples/lua/documents.lua` 演示分栏预览：`~/Pictures/Screenshots` 里的最近截图
-和脚本旁自带的纯文本笔记，各带打开、复制、定位动作。
+WayRun 的[插件目录](https://prslc.github.io/WayRun/zh_cn/plugins-directory.html)列出了完整示例与各自的依赖。
 
 ## 框架负责的协议行为
 

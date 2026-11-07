@@ -17,6 +17,13 @@ ICON = str(Path(__file__).resolve().with_name("icon.svg"))
 # it the search API is limited to 10 req/min and 60 req/hr per IP.
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN", "")
 
+LOCALE = os.environ.get("WAYRUN_LOCALE", "en")
+CATALOGS = {
+    "en": {"description": "Search GitHub repositories"},
+    "zh_cn": {"description": "搜索 GitHub 仓库"},
+}
+STRINGS = CATALOGS.get(LOCALE, CATALOGS["en"])
+
 
 def fetch_repos(query: str, token: str) -> dict[str, Any]:
     """Run the repository search, authenticating only when ``token`` is set."""
@@ -37,7 +44,7 @@ def fetch_repos(query: str, token: str) -> dict[str, Any]:
     id="github",
     name="GitHub",
     icon=ICON,
-    description="Search GitHub repositories",
+    description=STRINGS["description"],
 )
 def search(text: str) -> list[Item]:
     query = urlencode({"q": text, "per_page": 8})

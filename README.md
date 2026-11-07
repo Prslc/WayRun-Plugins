@@ -24,17 +24,7 @@ wayrun-plugin/
 ├── lua/wayrun.lua          # LuaLS stub for the wayrun SDK
 ├── .luarc.json             # points LuaLS's workspace library at lua/
 ├── template.lua            # Lua plugin skeleton (one file)
-├── examples/               # read-only worked examples
-│   ├── python/
-│   │   ├── github/         # GitHub repository search
-│   │   └── todo/           # full example: todo manager
-│   └── lua/
-│       ├── firefox.lua     # Firefox bookmarks and history (one host)
-│       ├── web.lua         # search-engine suggestions
-│       ├── cliphist.lua    # clipboard history over cliphist
-│       ├── screenshots.lua # recent screenshots with image previews
-│       └── documents.lua   # notes with text previews
-│           documents/      # sample notes the plugin ships
+├── examples/               # read-only worked examples, listed in the WayRun plugin directory
 ├── docs/en/                # PYTHON.md
 ├── docs/zh_cn/             # README_CN.md, PYTHON_CN.md
 ├── tests/                  # protocol contract, golden wire and vendoring tests
@@ -54,8 +44,7 @@ committed copy identical.
 A plugin is one directory: copy `template/`, edit `main.py`, register it in
 `plugins.toml`, and the framework owns the stdin/stdout JSON-RPC 2.0 transport.
 The quick start and the full API reference are in
-[docs/en/PYTHON.md](docs/en/PYTHON.md); `examples/python/` holds the two worked
-examples.
+[docs/en/PYTHON.md](docs/en/PYTHON.md).
 
 ## Lua plugins
 
@@ -67,15 +56,8 @@ the script contract, the full `wayrun` table, the sandbox and registration —
 lives with the launcher that implements it:
 [Lua plugins](https://github.com/Prslc/WayRun/blob/main/docs/en/lua.md).
 
-`examples/lua/firefox.lua` (a host with two plugins) and `examples/lua/web.lua`
-are complete worked examples, reading `places.sqlite` and the web respectively.
-`examples/lua/screenshots.lua` and `examples/lua/documents.lua` show the split
-preview column: recent images in `~/Pictures/Screenshots` and plain-text notes
-shipped beside the script, each with open/copy/reveal actions.
-`examples/lua/cliphist.lua` searches the `cliphist` history and copies an entry
-back with `wl-copy` (both on `PATH`); it declares `exec = { "cliphist" }`, so
-register it with `keyword = "c"` and `resident = true` to fetch the list once
-per typing burst.
+The WayRun [plugin directory](https://prslc.github.io/WayRun/en/plugins-directory.html)
+lists the worked examples and what each needs.
 
 The repo vendors the LuaLS stub at `lua/wayrun.lua`; `.luarc.json` points
 `Lua.workspace.library` at it, so `wayrun.` completes in `template.lua` and the
