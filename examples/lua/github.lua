@@ -4,14 +4,17 @@ local icon = wayrun.icon("papirus:github")
 local copy_icon = wayrun.icon("papirus:edit-copy")
 local git_icon = wayrun.icon("papirus:git")
 
+local BASE = "https://api.github.com"
 local SEARCH_REPOS = "/search/repositories"
 local SEARCH_USERS = "/search/users"
+local USER_REPOS = "/user/repos"
 local STARRED = "/user/starred"
 
--- GitHub search has no "starred by me" qualifier (`is:starred` is ignored), so
--- starred repos are listed and filtered here. Four pages cover 400 stars.
-local STARRED_PER_PAGE = 100
-local MAX_STARRED_PAGES = 4
+-- Own and starred repos come from listing endpoints: a token lists the user's
+-- repositories directly, and search has no "starred by me" qualifier
+-- (`is:starred` is ignored). Keywords filter the newest 400 entries locally.
+local LIST_PER_PAGE = 100
+local MAX_LIST_PAGES = 4
 local MAX_ROWS = 8
 
 local USER = { user = true, u = true }
@@ -63,7 +66,7 @@ local function headers(token)
 end
 
 local function fetch(path, params, token)
-  return wayrun.http.get("https://api.github.com" .. path, params, {
+  return wayrun.http.get(BASE .. path, params, {
     headers = headers(token),
     ttl = 300,
     timeout_ms = 3000
@@ -78,19 +81,24 @@ local function items_of(data)
   return data.items or data
 end
 
-local function query(path, params, token)
-  local res = fetch(path, params, token)
-  if res and res.status == 401 and token ~= "" then
-    res = fetch(path, params, "")
-  end
-  if not res or res.status ~= 200 or not res.body then
+local function items_from(res)
+  if not res or not res.body then
     return {}
   end
   local ok, data = pcall(wayrun.json.decode, res.body)
-  if not ok then
+  return ok and items_of(data) or {}
+end
+
+local function query(path, params, token)
+  local res = fetch(path, params, token)
+  -- Search answers without a token too; a revoked one should not blank it.
+  if res and res.status == 401 and token ~= "" and path:find("/search/", 1, true) then
+    res = fetch(path, params, "")
+  end
+  if not res or res.status ~= 200 then
     return {}
   end
-  return items_of(data)
+  return items_from(res)
 end
 
 local function rows(items, row)
@@ -105,15 +113,11 @@ local function emit_cached(path, params, token, emit, row)
   if not emit then
     return
   end
-  local cached = wayrun.http.cached("https://api.github.com" .. path, params, {
+  local items = items_from(wayrun.http.cached(BASE .. path, params, {
     headers = headers(token)
-  })
-  if not cached or not cached.body then
-    return
-  end
-  local ok, data = pcall(wayrun.json.decode, cached.body)
-  if ok then
-    emit(rows(items_of(data), row))
+  }))
+  if #items > 0 then
+    emit(rows(items, row))
   end
 end
 
@@ -202,19 +206,22 @@ local function token_hint()
   }
 end
 
-local function mine_rows(text, token, emit)
-  local params = { q = text == "" and "user:@me" or (text .. " user:@me"), per_page = 8 }
-  if text == "" then
-    params.sort = "updated"
-    params.order = "desc"
-  end
-  emit_cached(SEARCH_REPOS, params, token, emit, repo_row)
-  return rows(query(SEARCH_REPOS, params, token), repo_row)
+-- Without `affiliation`, `/user/repos` also returns collaborator and
+-- organisation-member repositories; owned-only matches what `user:@me` gave.
+local function user_repo_params(page)
+  return {
+    per_page = LIST_PER_PAGE,
+    page = page,
+    sort = "updated",
+    direction = "desc",
+    affiliation = "owner"
+  }
 end
 
+-- `created` puts the newest star first; `updated` the most recently pushed repo.
 local function starred_params(page)
   return {
-    per_page = STARRED_PER_PAGE,
+    per_page = LIST_PER_PAGE,
     page = page,
     sort = "created",
     direction = "desc"
@@ -227,29 +234,14 @@ local function append_items(out, items)
   end
 end
 
-local function starred_items(token)
+-- Stops at the first short page, so a small account costs one request.
+local function list_items(page_items)
   local out = {}
-  for page = 1, MAX_STARRED_PAGES do
-    local items = query(STARRED, starred_params(page), token)
+  for page = 1, MAX_LIST_PAGES do
+    local items = page_items(page)
     append_items(out, items)
-    if #items < STARRED_PER_PAGE then
+    if #items < LIST_PER_PAGE then
       break
-    end
-  end
-  return out
-end
-
-local function cached_starred_items(token)
-  local out = {}
-  for page = 1, MAX_STARRED_PAGES do
-    local cached = wayrun.http.cached("https://api.github.com" .. STARRED, starred_params(page), {
-      headers = headers(token)
-    })
-    if cached and cached.body then
-      local ok, data = pcall(wayrun.json.decode, cached.body)
-      if ok then
-        append_items(out, items_of(data))
-      end
     end
   end
   return out
@@ -287,8 +279,7 @@ local function repo_matches(repo, needles)
   return true
 end
 
-local function star_rows(items, text)
-  local needles = needles_of(text)
+local function match_rows(items, needles)
   local out = {}
   local seen = {}
   for _, repo in ipairs(items) do
@@ -304,14 +295,23 @@ local function star_rows(items, text)
   return out
 end
 
-local function starred_rows(text, token, emit)
+local function list_repo_rows(path, params_of, text, token, emit)
+  local needles = needles_of(text)
   if emit then
-    local cached = star_rows(cached_starred_items(token), text)
-    if #cached > 0 then
-      emit(rows(cached, repo_row))
+    local cached = list_items(function(page)
+      return items_from(wayrun.http.cached(BASE .. path, params_of(page), {
+        headers = headers(token)
+      }))
+    end)
+    local matched = match_rows(cached, needles)
+    if #matched > 0 then
+      emit(rows(matched, repo_row))
     end
   end
-  return rows(star_rows(starred_items(token), text), repo_row)
+  local fresh = list_items(function(page)
+    return query(path, params_of(page), token)
+  end)
+  return rows(match_rows(fresh, needles), repo_row)
 end
 
 local function top()
@@ -376,14 +376,14 @@ return {
         if token == "" then
           return token_hint()
         end
-        return mine_rows(rest, token, emit)
+        return list_repo_rows(USER_REPOS, user_repo_params, rest, token, emit)
       end
 
       if STAR[mode] then
         if token == "" then
           return token_hint()
         end
-        return starred_rows(rest, token, emit)
+        return list_repo_rows(STARRED, starred_params, rest, token, emit)
       end
 
       if REPO[mode] then
