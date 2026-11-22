@@ -17,6 +17,11 @@ local LIST_PER_PAGE = 100
 local MAX_LIST_PAGES = 4
 local MAX_ROWS = 8
 
+-- Search repeats on backspace and benefits from a long cache; a listing is
+-- sorted by push time, so a new push should surface within half a minute.
+local SEARCH_TTL = 300
+local LIST_TTL = 30
+
 local USER = { user = true, u = true }
 local MINE = { mine = true, my = true, m = true, ["我的"] = true }
 local STAR = { star = true, starred = true, s = true, ["星标"] = true }
@@ -65,12 +70,17 @@ local function headers(token)
   return out
 end
 
-local function fetch(path, params, token)
-  return wayrun.http.get(BASE .. path, params, {
+local function fetch(path, params, token, ttl)
+  local ok, res = pcall(wayrun.http.get, BASE .. path, params, {
     headers = headers(token),
-    ttl = 300,
+    ttl = ttl or SEARCH_TTL,
     timeout_ms = 3000
   })
+  if not ok then
+    wayrun.log("github " .. path .. ": " .. tostring(res))
+    error(res, 0)
+  end
+  return res
 end
 
 -- Search answers { items = {...} }; the listing endpoints answer a bare array.
@@ -86,17 +96,25 @@ local function items_from(res)
     return {}
   end
   local ok, data = pcall(wayrun.json.decode, res.body)
-  return ok and items_of(data) or {}
+  if not ok then
+    wayrun.log("github: malformed reply: " .. tostring(data))
+    return {}
+  end
+  return items_of(data)
 end
 
-local function query(path, params, token)
-  local res = fetch(path, params, token)
+local function query(path, params, token, ttl)
+  local res = fetch(path, params, token, ttl)
   -- Search answers without a token too; a revoked one should not blank it.
   if res and res.status == 401 and token ~= "" and path:find("/search/", 1, true) then
-    res = fetch(path, params, "")
+    res = fetch(path, params, "", ttl)
   end
-  if not res or res.status ~= 200 then
+  if not res then
     return {}
+  end
+  if res.status ~= 200 then
+    wayrun.log("github " .. path .. " -> HTTP " .. tostring(res.status))
+    return {}, res.status
   end
   return items_from(res)
 end
@@ -176,6 +194,28 @@ local function hint_row(title, summary)
   return { title = title, summary = summary, icon = icon }
 end
 
+local function failure_summary(status)
+  if status == 401 then
+    return t("The token was rejected; update GITHUB_TOKEN or the token file",
+      "Token 被拒绝，请更新 GITHUB_TOKEN 或 token 文件")
+  end
+  if status == 403 then
+    return t("GitHub denied the request; check the token or wait for the rate limit",
+      "GitHub 拒绝访问，请检查 token 或等待限流解除")
+  end
+  if status == 422 then
+    return t("GitHub rejected the search query", "GitHub 拒绝了该搜索查询")
+  end
+  return t("GitHub returned HTTP " .. tostring(status),
+    "GitHub 返回 HTTP " .. tostring(status))
+end
+
+local function failure_hint(status)
+  return {
+    hint_row(t("GitHub request failed", "GitHub 请求失败"), failure_summary(status))
+  }
+end
+
 local function user_hint()
   return {
     hint_row(
@@ -208,11 +248,12 @@ end
 
 -- Without `affiliation`, `/user/repos` also returns collaborator and
 -- organisation-member repositories; owned-only matches what `user:@me` gave.
+-- `pushed` is the last commit push; `updated` also moves on metadata edits.
 local function user_repo_params(page)
   return {
     per_page = LIST_PER_PAGE,
     page = page,
-    sort = "updated",
+    sort = "pushed",
     direction = "desc",
     affiliation = "owner"
   }
@@ -226,25 +267,6 @@ local function starred_params(page)
     sort = "created",
     direction = "desc"
   }
-end
-
-local function append_items(out, items)
-  for _, item in ipairs(items) do
-    out[#out + 1] = item
-  end
-end
-
--- Stops at the first short page, so a small account costs one request.
-local function list_items(page_items)
-  local out = {}
-  for page = 1, MAX_LIST_PAGES do
-    local items = page_items(page)
-    append_items(out, items)
-    if #items < LIST_PER_PAGE then
-      break
-    end
-  end
-  return out
 end
 
 local function needles_of(text)
@@ -279,17 +301,28 @@ local function repo_matches(repo, needles)
   return true
 end
 
-local function match_rows(items, needles)
+-- Stops at MAX_ROWS matches or the first short page; a bare listing then
+-- costs one request, and a rare keyword scans deeper only because it must.
+local function collect_matches(page_items, needles)
   local out = {}
   local seen = {}
-  for _, repo in ipairs(items) do
-    if #out >= MAX_ROWS then
-      break
+  for page = 1, MAX_LIST_PAGES do
+    local items, status = page_items(page)
+    if status then
+      return out, status
     end
-    local name = text_of(repo.full_name)
-    if not seen[name] and repo_matches(repo, needles) then
-      seen[name] = true
-      out[#out + 1] = repo
+    for _, repo in ipairs(items) do
+      local name = text_of(repo.full_name)
+      if not seen[name] and repo_matches(repo, needles) then
+        seen[name] = true
+        out[#out + 1] = repo
+        if #out >= MAX_ROWS then
+          return out
+        end
+      end
+    end
+    if #items < LIST_PER_PAGE then
+      break
     end
   end
   return out
@@ -298,20 +331,22 @@ end
 local function list_repo_rows(path, params_of, text, token, emit)
   local needles = needles_of(text)
   if emit then
-    local cached = list_items(function(page)
+    local cached = collect_matches(function(page)
       return items_from(wayrun.http.cached(BASE .. path, params_of(page), {
         headers = headers(token)
       }))
-    end)
-    local matched = match_rows(cached, needles)
-    if #matched > 0 then
-      emit(rows(matched, repo_row))
+    end, needles)
+    if #cached > 0 then
+      emit(rows(cached, repo_row))
     end
   end
-  local fresh = list_items(function(page)
-    return query(path, params_of(page), token)
-  end)
-  return rows(match_rows(fresh, needles), repo_row)
+  local fresh, status = collect_matches(function(page)
+    return query(path, params_of(page), token, LIST_TTL)
+  end, needles)
+  if #fresh == 0 and status then
+    return failure_hint(status)
+  end
+  return rows(fresh, repo_row)
 end
 
 local function top()
@@ -330,8 +365,8 @@ local function top()
   if token ~= "" then
     table.insert(out, hint_row(
       t("My repositories", "我的仓库"),
-      t("m / mine <keywords> · bare m lists your latest",
-        "m / mine <关键词> · 仅输入 m 列出最近更新")
+      t("m / mine <keywords> · bare m lists most recently pushed",
+        "m / mine <关键词> · 仅输入 m 按最近提交列出")
     ))
     table.insert(out, hint_row(
       t("Starred repositories", "星标仓库"),
@@ -369,7 +404,11 @@ return {
         end
         local params = { q = rest, per_page = 8 }
         emit_cached(SEARCH_USERS, params, token, emit, user_row)
-        return rows(query(SEARCH_USERS, params, token), user_row)
+        local items, status = query(SEARCH_USERS, params, token)
+        if #items == 0 and status then
+          return failure_hint(status)
+        end
+        return rows(items, user_row)
       end
 
       if MINE[mode] then
@@ -395,7 +434,11 @@ return {
 
       local params = { q = text, per_page = 8 }
       emit_cached(SEARCH_REPOS, params, token, emit, repo_row)
-      return rows(query(SEARCH_REPOS, params, token), repo_row)
+      local items, status = query(SEARCH_REPOS, params, token)
+      if #items == 0 and status then
+        return failure_hint(status)
+      end
+      return rows(items, repo_row)
     end
   }
 }
